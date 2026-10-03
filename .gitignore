@@ -2,3 +2,7 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# 阅读素材（各章 markdown / PDF / 配图）不入库，放在本地即可
+asset/
+assets/
