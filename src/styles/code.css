@@ -1,0 +1,38 @@
+/* Code block chrome. Token colours are emitted inline by shiki
+   (see src/lib/shikiTheme.ts) so they stay in the page's own palette. */
+.doc code {
+  padding: 0.06em 0.32em;
+  border: 1px solid var(--rule-soft);
+  border-radius: 2px;
+  background: #f1f4f7;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--ink);
+}
+
+.doc pre {
+  margin: 1.1em 0;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--paper-2);
+  overflow-x: auto;
+  font-size: 12.8px;
+  line-height: 1.55;
+}
+
+.doc pre code {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  white-space: pre;
+  color: var(--ink-copy);
+  font-variant-ligatures: none;
+}
+
+.doc pre code.shiki .line {
+  display: inline;
+}

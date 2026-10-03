@@ -1,0 +1,213 @@
+/* The panels library owns the flex layout of `.split`. Panels are its direct
+   children: an outer sizing box, then the class-named slot inside it. */
+.split > [data-panel] {
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane-slot {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane-slot > .pane {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--sheet);
+}
+
+/* Pane identity: the ink that colours this pane's rules, links and active tab. */
+.pane[data-lang='zh'] {
+  --pane-ink: var(--zh);
+}
+
+.pane[data-lang='en'] {
+  --pane-ink: var(--en);
+}
+
+.pane[data-lang='pdf'] {
+  --pane-ink: var(--pdf);
+  background: var(--xerox);
+}
+
+.pane-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px 8px 12px;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--paper-2);
+}
+
+.pane-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--pane-ink);
+  transform-origin: 0 50%;
+}
+
+.pane-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.switch {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+}
+
+.sw {
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sw:hover:not([aria-pressed='true']):not(:disabled) {
+  color: var(--ink);
+  background: rgba(18, 26, 36, 0.06);
+}
+
+.sw[aria-pressed='true'] {
+  background: var(--pane-ink);
+  color: var(--sheet);
+}
+
+.sw:disabled {
+  color: var(--ink-faint);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pane-main {
+  position: relative;
+  display: flex;
+  min-height: 0;
+}
+
+.pane-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.pane[data-lang='pdf'] .pane-scroll {
+  overflow: hidden;
+}
+
+.pdf-view {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--xerox);
+}
+
+.doc-loading {
+  padding: 22px clamp(18px, 4vw, 46px);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.notice {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  background: var(--sheet);
+  text-align: center;
+}
+
+.notice-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.notice-sub {
+  max-width: 34ch;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-faint);
+}
+
+.fatal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  text-align: center;
+}
+
+.fatal-code {
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--sheet);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.pane-scroll::-webkit-scrollbar,
+.chapters::-webkit-scrollbar,
+.outline::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+.pane-scroll::-webkit-scrollbar-thumb,
+.chapters::-webkit-scrollbar-thumb,
+.outline::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 6px;
+}
+
+.pane-scroll::-webkit-scrollbar-thumb:hover,
+.chapters::-webkit-scrollbar-thumb:hover,
+.outline::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
+  background-clip: content-box;
+}

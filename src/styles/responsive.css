@@ -1,0 +1,76 @@
+@media (max-width: 1180px) {
+  :root {
+    --shelf-w: 240px;
+  }
+
+  .outline {
+    flex-basis: 196px;
+    width: 196px;
+  }
+}
+
+/* Below the desktop breakpoint the shelf becomes a drawer and the two panes
+   stack, each keeping its own scroll. */
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app[data-nav='closed'] .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shelf {
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    left: 0;
+    z-index: 25;
+    width: min(304px, 86vw);
+    transform: translateX(-103%);
+    transition: transform 0.22s ease;
+  }
+
+  .app[data-nav='open'] .shelf {
+    transform: none;
+  }
+
+  .app[data-nav='closed'] .shelf {
+    visibility: visible;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: var(--topbar-h) 0 0;
+    z-index: 24;
+    background: rgba(18, 26, 36, 0.3);
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .doc {
+    max-width: none;
+  }
+
+  .outline {
+    flex-basis: 168px;
+    width: 168px;
+  }
+}
+
+@media (max-width: 560px) {
+  :root {
+    --topbar-h: 48px;
+  }
+
+  .current {
+    display: none;
+  }
+
+  .outline {
+    flex-basis: 148px;
+    width: 148px;
+  }
+}

@@ -1,0 +1,38 @@
+/* One orchestrated moment: a new document inks its pane's top rule and rises in. */
+@keyframes rule-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pane-top::before {
+  animation: rule-in 0.34s cubic-bezier(0.22, 0.7, 0.3, 1) both;
+}
+
+.doc {
+  animation: sheet-in 0.24s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

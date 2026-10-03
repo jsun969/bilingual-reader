@@ -1,0 +1,46 @@
+/* ---------------------------------------------------------------------------
+   Design tokens — "ink on a drafting desk".
+   Two printing inks identify the two languages; the original is a photocopy.
+   --------------------------------------------------------------------------- */
+:root {
+  /* ink */
+  --ink: #121a24;
+  --ink-copy: #1f2937;
+  --ink-soft: #57626f;
+  --ink-faint: #69737f;
+
+  /* paper */
+  --paper: #e8ecf1;
+  --paper-2: #f6f8fa;
+  --sheet: #ffffff;
+  --xerox: #f3f2ee;
+  --rule: #c8d2de;
+  --rule-soft: #e2e8ee;
+  --grid: rgba(18, 26, 36, 0.05);
+
+  /* pane inks */
+  --zh: #a9351f;
+  --en: #1e4a9b;
+  --pdf: #39424f;
+
+  /* code tokens, kept in the same press: plum / green / ochre */
+  --code-kw: #8c2f6b;
+  --code-str: #1f6b4f;
+  --code-num: #8a5a00;
+  --code-fn: #1e4a9b;
+  --code-meta: #6b4a9e;
+
+  /* type: Archivo carries titles and instrument labels (via its width axis),
+     IBM Plex Sans is the reading face, IBM Plex Mono carries data and code,
+     PingFang SC renders the Chinese. */
+  --font-display: 'Archivo', 'PingFang SC', 'Hiragino Sans GB', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui,
+    sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --topbar-h: 52px;
+  --shelf-w: 276px;
+  --gutter-w: 15px;
+
+  color-scheme: light;
+}

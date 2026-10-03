@@ -1,0 +1,106 @@
+/* The divider is the dashed boundary line of an address-space diagram.
+   Sizing follows the layout axis: flex-basis is the width in a row and the
+   height in a column, so one rule covers both orientations. */
+.gutter {
+  position: relative;
+  flex: 0 0 var(--gutter-w);
+  min-width: 0;
+  min-height: 0;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.gutter::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background-image: repeating-linear-gradient(180deg, var(--rule) 0 5px, transparent 5px 10px);
+}
+
+.gutter:hover::before,
+.gutter:focus-visible::before {
+  background-image: none;
+  background-color: var(--ink);
+}
+
+.gutter-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 30px;
+  margin: -15px 0 0 -2px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+
+.gutter:hover .gutter-grip,
+.gutter:focus-visible .gutter-grip {
+  background: var(--ink);
+}
+
+.gutter-read {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -54px);
+  padding: 2px 5px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gutter:hover .gutter-read,
+.gutter:focus-visible .gutter-read,
+body.is-dragging .gutter-read {
+  opacity: 1;
+}
+
+body.is-dragging {
+  cursor: col-resize;
+  user-select: none;
+}
+
+body.is-dragging .gutter-read {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--sheet);
+}
+
+body.is-dragging .gutter-grip {
+  background: var(--ink);
+}
+
+/* Stacked (vertical) layout: the same dashed boundary, laid on its side. */
+@media (max-width: 900px) {
+  .gutter {
+    cursor: row-resize;
+  }
+
+  .gutter::before {
+    inset: 50% 0 auto 0;
+    width: auto;
+    height: 1px;
+    margin: -0.5px 0 0;
+    background-image: repeating-linear-gradient(90deg, var(--rule) 0 5px, transparent 5px 10px);
+  }
+
+  .gutter-grip {
+    width: 30px;
+    height: 4px;
+    margin: -2px 0 0 -15px;
+  }
+
+  .gutter-read {
+    transform: translate(-66px, -50%);
+  }
+}
