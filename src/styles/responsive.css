@@ -50,10 +50,6 @@
     display: none;
   }
 
-  .doc {
-    max-width: none;
-  }
-
   .outline {
     flex-basis: 168px;
     width: 168px;

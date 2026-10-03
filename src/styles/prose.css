@@ -1,7 +1,8 @@
-/* Chapter text. Language-specific leading: Chinese needs more air than Latin. */
+/* Chapter text. Language-specific leading: Chinese needs more air than Latin.
+   In split view the text runs the full width of its pane; only a single pane
+   gets a capped, centred reading column (see below). */
 .doc {
   position: relative;
-  max-width: var(--measure);
   padding: clamp(20px, 3.4vw, 36px) clamp(18px, 4vw, 46px) 26vh;
   font-family: var(--font-body);
   font-size: 16.5px;
@@ -23,17 +24,15 @@
   margin-top: 0;
 }
 
-/* Single pane: a wider column, centred on the sheet instead of hanging off the
-   left edge. In split view each pane is narrower than the measure, so none of
-   this has anything to do there. */
+/* Single pane: cap the line length and centre the column on the sheet. */
 .app[data-split='false'] .doc,
 .app[data-split='false'] .doc-loading {
-  max-width: var(--measure-single);
+  max-width: var(--measure);
   margin-inline: auto;
 }
 
 .app[data-split='false'] .pane[data-lang='en'] .doc {
-  max-width: var(--measure-single-latin);
+  max-width: var(--measure-latin);
 }
 
 .doc * {
