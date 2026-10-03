@@ -109,6 +109,7 @@ export function App() {
               side="left"
               chapter={chapter}
               lang={view.left}
+              split={view.split}
               onLangChange={(lang) => setLang('left', lang)}
             />
           </Panel>
@@ -125,6 +126,7 @@ export function App() {
                   side="right"
                   chapter={chapter}
                   lang={view.right}
+                  split={view.split}
                   onLangChange={(lang) => setLang('right', lang)}
                 />
               </Panel>

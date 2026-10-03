@@ -1,7 +1,7 @@
 /* Chapter text. Language-specific leading: Chinese needs more air than Latin. */
 .doc {
   position: relative;
-  max-width: 46rem;
+  max-width: var(--measure);
   padding: clamp(20px, 3.4vw, 36px) clamp(18px, 4vw, 46px) 26vh;
   font-family: var(--font-body);
   font-size: 16.5px;
@@ -21,6 +21,19 @@
 
 .doc > :first-child {
   margin-top: 0;
+}
+
+/* Single pane: a wider column, centred on the sheet instead of hanging off the
+   left edge. In split view each pane is narrower than the measure, so none of
+   this has anything to do there. */
+.app[data-split='false'] .doc,
+.app[data-split='false'] .doc-loading {
+  max-width: var(--measure-single);
+  margin-inline: auto;
+}
+
+.app[data-split='false'] .pane[data-lang='en'] .doc {
+  max-width: var(--measure-single-latin);
 }
 
 .doc * {

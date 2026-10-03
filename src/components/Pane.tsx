@@ -16,10 +16,12 @@ interface PaneProps {
   side: Side
   chapter: Chapter | undefined
   lang: Lang
+  /** Both panes are side by side: no room for the outline panel here. */
+  split: boolean
   onLangChange: (lang: Lang) => void
 }
 
-export function Pane({ side, chapter, lang, onLangChange }: PaneProps) {
+export function Pane({ side, chapter, lang, split, onLangChange }: PaneProps) {
   const doc = useChapterDocument(chapter, lang, side)
   const [outlineOpen, setOutlineOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -29,14 +31,14 @@ export function Pane({ side, chapter, lang, onLangChange }: PaneProps) {
   const pdfSource = chapter?.sources.pdf
   const markdownSource = isPdf ? undefined : chapter?.sources[lang]
   const key = chapter ? viewKey(side, chapter.slug, lang) : lang
-  const canOutline = !isPdf && doc.outline.length > 1
+  const canOutline = !isPdf && !split && doc.outline.length > 1
   const showOutline = outlineOpen && doc.status === 'ready' && canOutline
   const ids = useMemo(() => doc.outline.map((item) => item.id), [doc.outline])
   const activeId = useScrollSpy({ scrollRef, docRef, ids, enabled: showOutline })
 
   useEffect(() => {
-    if (isPdf) setOutlineOpen(false)
-  }, [isPdf])
+    if (isPdf || split) setOutlineOpen(false)
+  }, [isPdf, split])
 
   // Remember where this pane/chapter/language was left, and restore it on return.
   const lastOffset = useRef(0)

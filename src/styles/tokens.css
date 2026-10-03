@@ -42,5 +42,12 @@
   --shelf-w: 276px;
   --gutter-w: 15px;
 
+  /* Reading measure. Split panes are narrower than this anyway; a single pane
+     has room for a longer line — and Chinese sets solid with more characters
+     per line than Latin, which starts to strain past ~90. */
+  --measure: 46rem;
+  --measure-single: 54rem;
+  --measure-single-latin: 50rem;
+
   color-scheme: light;
 }
