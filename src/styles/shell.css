@@ -64,7 +64,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  height: 26px;
+  padding: 0 10px;
   border: 1px solid var(--rule);
   border-radius: 2px;
   background: var(--sheet);
@@ -93,11 +94,15 @@
   background: var(--sheet);
 }
 
-/* Window controls sit on the pane's own header: split right / split down / close. */
-.win-btn {
-  padding: 3px 7px;
-  font-size: 12px;
-  line-height: 1.2;
+/* Icon-only controls (outline, split right / down, close): same box as the
+   other tool buttons, the icon sets nothing but its own 13px size. */
+.icon-btn {
+  padding: 0 7px;
+}
+
+.icon-btn svg {
+  width: 13px;
+  height: 13px;
 }
 
 .tool-btn[hidden] {
@@ -116,6 +121,9 @@
 }
 
 .tool-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -123,6 +131,11 @@
   text-decoration: none;
   border-bottom: 1px solid transparent;
   padding-bottom: 1px;
+}
+
+.tool-link svg {
+  width: 12px;
+  height: 12px;
 }
 
 .tool-link:hover {

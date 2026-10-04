@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { LuColumns2, LuExternalLink, LuListTree, LuRows2, LuX } from 'react-icons/lu'
 import { COPY } from '../copy'
 import { LANGS, MAX_PANES, PREFERS_REDUCED_MOTION } from '../lib/config'
 import { viewKey } from '../lib/catalog'
@@ -138,47 +139,49 @@ export function Pane({
               title={COPY.openPdfTitle}
             >
               {COPY.openPdf}
+              <LuExternalLink />
             </a>
           ) : null}
           <button
-            className="tool-btn"
+            className="tool-btn icon-btn"
             type="button"
             aria-pressed={outlineOpen}
+            aria-label={COPY.outlineToggleTitle}
             hidden={!canOutline}
             title={COPY.outlineToggleTitle}
             onClick={() => setOutlineOpen((open) => !open)}
           >
-            {COPY.outlineToggle}
+            <LuListTree />
           </button>
           <button
-            className="tool-btn win-btn"
+            className="tool-btn icon-btn"
             type="button"
             disabled={!canSplit}
             title={canSplit ? COPY.splitRightTitle : COPY.paneLimitTitle(MAX_PANES)}
             aria-label={COPY.splitRightTitle}
             onClick={() => onSplit('row')}
           >
-            {COPY.splitRight}
+            <LuColumns2 />
           </button>
           <button
-            className="tool-btn win-btn"
+            className="tool-btn icon-btn"
             type="button"
             disabled={!canSplit}
             title={canSplit ? COPY.splitDownTitle : COPY.paneLimitTitle(MAX_PANES)}
             aria-label={COPY.splitDownTitle}
             onClick={() => onSplit('col')}
           >
-            {COPY.splitDown}
+            <LuRows2 />
           </button>
           <button
-            className="tool-btn win-btn"
+            className="tool-btn icon-btn"
             type="button"
             hidden={!canClose}
             title={COPY.closePaneTitle}
             aria-label={COPY.closePaneTitle}
             onClick={onClose}
           >
-            {COPY.closePane}
+            <LuX />
           </button>
         </div>
       </header>
@@ -186,8 +189,14 @@ export function Pane({
         <div className="pane-scroll" ref={scrollRef}>
           {renderBody()}
         </div>
-        {showOutline ? (
-          <OutlinePanel outline={doc.outline} activeId={activeId} onJump={jump} />
+        {/* Kept mounted while available, so opening it slides rather than pops. */}
+        {canOutline ? (
+          <OutlinePanel
+            outline={doc.outline}
+            activeId={activeId}
+            open={showOutline}
+            onJump={jump}
+          />
         ) : null}
       </div>
     </section>

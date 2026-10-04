@@ -1,6 +1,6 @@
 /* The outline floats over the pane's right edge instead of taking a column, so
-   the chapter text keeps its full width — same glass as the shelf. It works in
-   every pane, split or not. */
+   the chapter text keeps its full width — same glass and same slide as the
+   shelf, mirrored. It works in every pane, split or not. */
 .outline {
   position: absolute;
   inset-block: 0;
@@ -17,6 +17,18 @@
   padding-bottom: 24px;
   scrollbar-width: thin;
   scrollbar-color: var(--rule) transparent;
+  transform: translateX(103%);
+  transition: transform 0.22s ease, visibility 0s;
+}
+
+.outline[data-open='true'] {
+  transform: none;
+}
+
+/* Off-canvas: out of the tab order, but still slides out before it disappears. */
+.outline[data-open='false'] {
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s 0.22s;
 }
 
 .outline-head {
