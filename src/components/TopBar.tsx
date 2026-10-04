@@ -1,3 +1,4 @@
+import { LuLibraryBig } from 'react-icons/lu'
 import { COPY } from '../copy'
 import type { Chapter } from '../types'
 
@@ -11,12 +12,14 @@ export function TopBar({ chapter, navOpen, onToggleNav }: TopBarProps) {
   return (
     <header className="topbar grid-bg">
       <button
-        className="tool-btn nav-toggle"
+        className="tool-btn icon-btn nav-toggle"
         type="button"
         aria-expanded={navOpen}
+        aria-label={COPY.navToggle}
+        title={COPY.navToggle}
         onClick={onToggleNav}
       >
-        {COPY.navToggle}
+        <LuLibraryBig />
       </button>
       <p className="brand">
         <span className="brand-mark">{COPY.appName}</span>

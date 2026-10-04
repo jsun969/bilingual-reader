@@ -115,6 +115,31 @@
   color: var(--sheet);
 }
 
+/* The shelf toggle is the one control that has to be findable at a glance,
+   so it gets a taller box and a larger icon than the 13px pane tools. */
+.nav-toggle {
+  height: 34px;
+  padding: 0 9px;
+}
+
+.nav-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-toggle[aria-expanded='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--sheet);
+}
+
+/* Keep the filled "shelf is open" look on hover instead of the pale hover box. */
+.nav-toggle[aria-expanded='true']:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--sheet);
+}
+
 .nav-toggle[aria-expanded='false'] {
   border-style: dashed;
   color: var(--ink-faint);
