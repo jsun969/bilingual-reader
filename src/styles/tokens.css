@@ -40,6 +40,9 @@
 
   --topbar-h: 52px;
   --shelf-w: 276px;
+  /* The floating shelf's paper: at 65% the text behind it shows through as a
+     blur. Bigger = more opaque; 45–55% starts to cost chapter-list contrast. */
+  --shelf-opacity: 65%;
   --gutter-w: 15px;
 
   /* Single-pane reading column: a share of the pane, so it grows with the

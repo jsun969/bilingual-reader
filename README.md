@@ -58,8 +58,9 @@ asset/                          # 也可以是 assets/，不入库（见 .gitign
 - **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
   单栏的中文正文列宽占栏宽 75%、英文 70% 并居中（≤900px 的手机上铺满整栏）；多栏时正文铺满栏宽。
 - **目录**：`.shelf` 是 `.workspace` 里的绝对定位浮层（`position: absolute`，不占网格列），
-  底色是 86% 不透明的 `--paper` + `backdrop-filter: blur()`，开合用 `data-nav` 切换 `transform`，
-  关闭时 `visibility: hidden` 让开合动画走完又不留在 tab 顺序里。
+  底色是 `--paper` 按 `--shelf-opacity`（tokens.css，默认 65%）透出来 + `backdrop-filter: blur(12px)`，
+  连当前章节那行的高亮也是半透明白，整块读起来才是一层玻璃而不是贴了一张纸；
+  开合用 `data-nav` 切换 `transform`，关闭时 `visibility: hidden` 让开合动画走完又不留在 tab 顺序里。
   关掉它的方式：顶栏「目录」、选章节、点浮层以外的任何地方——`.workspace` 上挂了 `pointerdown`
   监听，落在 `.shelf` 之外的按下就关（用 ref 判断，不查 class）；顶栏在 `.workspace` 之外，
   所以「目录」按钮自己的 toggle 不受影响，滚轮也照常滚正文。手机端另有一层 `.scrim` 只负责压暗和挡住穿透。
