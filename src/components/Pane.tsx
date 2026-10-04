@@ -40,6 +40,8 @@ export function Pane({
   const [outlineOpen, setOutlineOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const docRef = useRef<HTMLElement>(null)
+  const mainRef = useRef<HTMLDivElement>(null)
+  const outlineRef = useRef<HTMLElement>(null)
 
   const isPdf = lang === 'pdf'
   const pdfSource = chapter?.sources.pdf
@@ -53,6 +55,20 @@ export function Pane({
   useEffect(() => {
     if (isPdf) setOutlineOpen(false)
   }, [isPdf])
+
+  // Pressing the text puts the outline away, the same way the shelf behaves. The
+  // listener sits on `.pane-main`, so the ☰ button in the header keeps its own
+  // toggle, and each pane only ever closes its own outline.
+  useEffect(() => {
+    const main = mainRef.current
+    if (!showOutline || !main) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && outlineRef.current?.contains(event.target)) return
+      setOutlineOpen(false)
+    }
+    main.addEventListener('pointerdown', onPointerDown)
+    return () => main.removeEventListener('pointerdown', onPointerDown)
+  }, [showOutline])
 
   // Remember where this pane/chapter/language was left, and restore it on return.
   const lastOffset = useRef({ key: '', top: 0 })
@@ -185,13 +201,14 @@ export function Pane({
           </button>
         </div>
       </header>
-      <div className="pane-main">
+      <div className="pane-main" ref={mainRef}>
         <div className="pane-scroll" ref={scrollRef}>
           {renderBody()}
         </div>
         {/* Kept mounted while available, so opening it slides rather than pops. */}
         {canOutline ? (
           <OutlinePanel
+            ref={outlineRef}
             outline={doc.outline}
             activeId={activeId}
             open={showOutline}

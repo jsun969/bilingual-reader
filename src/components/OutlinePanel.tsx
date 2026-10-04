@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { COPY } from '../copy'
 import type { OutlineItem } from '../types'
 
@@ -7,11 +8,13 @@ interface OutlinePanelProps {
   /** Kept mounted and slid in and out, like the shelf. */
   open: boolean
   onJump: (id: string) => void
+  /** The panel itself: the pane watches presses outside it. */
+  ref?: Ref<HTMLElement>
 }
 
-export function OutlinePanel({ outline, activeId, open, onJump }: OutlinePanelProps) {
+export function OutlinePanel({ outline, activeId, open, onJump, ref }: OutlinePanelProps) {
   return (
-    <aside className="outline" data-open={open}>
+    <aside className="outline" data-open={open} ref={ref}>
       <p className="outline-head">{COPY.outlineTitle}</p>
       <nav aria-label={COPY.outlineTitle}>
         {outline.map((item) => (
