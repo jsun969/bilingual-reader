@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { COPY } from './copy'
-import { DESKTOP_QUERY } from './lib/config'
 import { findChapter } from './lib/catalog'
 import { countPanes } from './lib/layout'
 import { useViewerStore } from './lib/store'
@@ -15,7 +14,9 @@ export function App() {
   const chapterSlug = useViewerStore((state) => state.chapter)
   const layout = useViewerStore((state) => state.layout)
   const openChapter = useViewerStore((state) => state.openChapter)
-  const [navOpen, setNavOpen] = useState(() => window.matchMedia(DESKTOP_QUERY).matches)
+  // Closed by default: the shelf floats over the text now, so it only appears
+  // when asked for. Reopening it on every reload was the desktop default.
+  const [navOpen, setNavOpen] = useState(false)
   const workspaceRef = useRef<HTMLDivElement>(null)
   const shelfRef = useRef<HTMLElement>(null)
 

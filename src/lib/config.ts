@@ -1,6 +1,5 @@
 import type { Lang, LayoutNode } from '../types'
 
-export const DESKTOP_QUERY = '(min-width: 901px)'
 /** Four windows is as deep as the tree can get while both sides of every split stay usable. */
 export const MAX_PANES = 4
 export const PREFERS_REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches
