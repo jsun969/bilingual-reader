@@ -2,11 +2,6 @@
   :root {
     --shelf-w: 240px;
   }
-
-  .outline {
-    flex-basis: 196px;
-    width: 196px;
-  }
 }
 
 /* Below the desktop breakpoint the shelf is wider relative to the screen and
@@ -34,11 +29,6 @@
   .app[data-split='false'] .doc-loading {
     max-width: 100%;
   }
-
-  .outline {
-    flex-basis: 168px;
-    width: 168px;
-  }
 }
 
 @media (max-width: 560px) {
@@ -48,10 +38,5 @@
 
   .current {
     display: none;
-  }
-
-  .outline {
-    flex-basis: 148px;
-    width: 148px;
   }
 }

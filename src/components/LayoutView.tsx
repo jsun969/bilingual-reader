@@ -40,7 +40,6 @@ export function LayoutView({ root, chapter }: LayoutViewProps) {
           paneId={node.id}
           chapter={chapter}
           lang={node.lang}
-          single={paneCount === 1}
           canSplit={paneCount < MAX_PANES}
           canClose={paneCount > 1}
           onLangChange={(lang) => changeLang(node.id, lang)}

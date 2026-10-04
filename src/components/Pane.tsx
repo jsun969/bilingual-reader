@@ -18,8 +18,6 @@ interface PaneProps {
   paneId: string
   chapter: Chapter | undefined
   lang: Lang
-  /** This is the only window open, so there is room for the outline beside it. */
-  single: boolean
   canSplit: boolean
   canClose: boolean
   onLangChange: (lang: Lang) => void
@@ -31,7 +29,6 @@ export function Pane({
   paneId,
   chapter,
   lang,
-  single,
   canSplit,
   canClose,
   onLangChange,
@@ -47,14 +44,14 @@ export function Pane({
   const pdfSource = chapter?.sources.pdf
   const markdownSource = isPdf ? undefined : chapter?.sources[lang]
   const key = chapter ? viewKey(paneId, chapter.slug, lang) : lang
-  const canOutline = !isPdf && single && doc.outline.length > 1
+  const canOutline = !isPdf && doc.outline.length > 1
   const showOutline = outlineOpen && doc.status === 'ready' && canOutline
   const ids = useMemo(() => doc.outline.map((item) => item.id), [doc.outline])
   const activeId = useScrollSpy({ scrollRef, docRef, ids, enabled: showOutline })
 
   useEffect(() => {
-    if (isPdf || !single) setOutlineOpen(false)
-  }, [isPdf, single])
+    if (isPdf) setOutlineOpen(false)
+  }, [isPdf])
 
   // Remember where this pane/chapter/language was left, and restore it on return.
   const lastOffset = useRef({ key: '', top: 0 })

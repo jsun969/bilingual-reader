@@ -18,7 +18,7 @@ export const COPY = {
   loadFailedTitle: '这一章读不出来。',
   loadFailedSub: (path: string, detail: string) => `${path} → ${detail}`,
   outlineTitle: '大纲',
-  outlineToggle: '大纲',
+  outlineToggle: '☰',
   outlineToggleTitle: '显示本栏的大纲',
   openPdf: '原件 ↗',
   openPdfTitle: '在新标签页打开原件',

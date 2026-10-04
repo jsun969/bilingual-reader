@@ -1,6 +1,6 @@
 /* The shelf floats over the reading surface instead of owning a column, so the
    panes keep the full width. Its paper is see-through and blurs whatever is
-   behind it — the strength is `--shelf-opacity` in tokens.css. */
+   behind it — see `--glass-opacity` in tokens.css. */
 .shelf {
   position: absolute;
   inset-block: 0;
@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--rule);
-  background-color: color-mix(in srgb, var(--paper) var(--shelf-opacity), transparent);
+  background-color: color-mix(in srgb, var(--paper) var(--glass-opacity), transparent);
   backdrop-filter: blur(12px);
   box-shadow: 8px 0 26px rgba(18, 26, 36, 0.12);
   overflow: hidden;
