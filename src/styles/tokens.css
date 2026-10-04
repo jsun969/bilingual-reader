@@ -42,11 +42,11 @@
   --shelf-w: 276px;
   --gutter-w: 15px;
 
-  /* Single-pane reading measure: Chinese sets solid with more characters per
-     line than Latin, which starts to strain past ~90. Split panes use their
-     full width instead. */
-  --measure: 54rem;
-  --measure-latin: 50rem;
+  /* Single-pane reading column: a share of the pane, so it grows with the
+     window. Chinese sets solid with more characters per line than Latin, so it
+     takes the wider share. Multi-pane layouts use each pane's full width. */
+  --measure: 75%;
+  --measure-latin: 70%;
 
   color-scheme: light;
 }

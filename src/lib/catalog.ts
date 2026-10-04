@@ -1,4 +1,4 @@
-import type { Catalog, Chapter, RenderedDoc, Side } from '../types'
+import type { Catalog, Chapter, RenderedDoc } from '../types'
 
 /** Rendered chapter HTML, shared between panes and kept across chapter switches. */
 export const docCache = new Map<string, RenderedDoc>()
@@ -6,8 +6,9 @@ export const docCache = new Map<string, RenderedDoc>()
 /** Last scroll offset per pane / chapter / language, so switching back keeps your place. */
 export const scrollMemory = new Map<string, number>()
 
-export function viewKey(side: Side, slug: string, lang: string): string {
-  return `${side}/${slug}/${lang}`
+/** Pane ids are unique, so this keys both caches and the per-pane id prefix. */
+export function viewKey(paneId: string, slug: string, lang: string): string {
+  return `${paneId}/${slug}/${lang}`
 }
 
 export async function fetchCatalog(signal?: AbortSignal): Promise<Catalog> {

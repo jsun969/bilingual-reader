@@ -1,8 +1,9 @@
 # bilingual-reader
 
-双栏双语文档阅读器：左右两栏各自可以在 **中文 / 原文 Markdown / 原件 PDF** 之间切换，
-左侧是章节目录。切到单栏时正文列会加宽并居中，栏内可以再展开本章大纲；分屏时每栏更窄，
-不显示大纲入口。
+多窗格双语文档阅读器：每一栏都可以单独在 **中文 / 原文 Markdown / 原件 PDF** 之间切换，
+左侧是章节目录。栏头上有三个窗口按钮：**◫ 向右分栏**、**▤ 向下分栏**、**✕ 关闭这一栏**，
+所以可以平铺成左右 / 上下任意组合，最多 4 栏。只剩一栏时正文列加宽并居中，栏内可以再展开
+本章大纲；多栏时每栏更窄，不显示大纲入口。
 
 素材按「一章一个目录」组织即可，放哪套文档都行（比如 OSTEP 各章）。
 
@@ -43,12 +44,14 @@ asset/                          # 也可以是 assets/，不入库（见 .gitign
   `/api/chapters.json`（章节、阅读时长、文件路径）并直接以正确的 MIME 类型发送 `/asset/**`
   （PDF、图片、markdown）。`vite build` 会把素材复制进 `dist/` 并冻结一份 catalog。
 - **渲染**（`src/lib/markdown.ts`）：marked + marked-footnote 解析 markdown，随后在 DOM 上做几件事：
-  给每栏的 id 加前缀（`L-` / `R-`），这样两栏显示同一章时锚点、脚注、图号引用都不会串；
+  给每栏的 id 加前缀（栏的 id，如 `p1-`），这样多栏显示同一章时锚点、脚注、图号引用都不会串；
   把图片相对路径解析到 `/asset/...`；把 `#fig-4-1` 这类文内引用指向正确的元素。
 - **代码高亮**（`src/lib/highlighter.ts`）：shiki，按需加载语法，主题用页面自己的油墨色
   （`src/lib/shikiTheme.ts`）。没有标注语言的代码块保持原样 —— 那些是书里的 ASCII 图。
-- **分屏**：`react-resizable-panels` 负责拖拽、键盘和分隔条语义（横向 / 纵向随断点切换）。
+- **窗口**：窗口树（`src/types.ts` 的 `LayoutNode`，每个叶子是一栏、每个分支是一根可拖拽的分隔条）
+  由 `src/lib/layout.ts` 增删改，`src/components/LayoutView.tsx` 递归渲染成嵌套的
+  `react-resizable-panels` 组，拖拽、键盘和分隔条语义都由它负责。
 - **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
-  单栏的中文行宽 54rem、英文 50rem 并居中；分栏时正文铺满栏宽。
+  单栏的中文正文列宽占栏宽 75%、英文 70% 并居中（≤900px 的手机上铺满整栏）；多栏时正文铺满栏宽。
 
-阅读位置、分栏比例、两栏语言都记在 `localStorage`（`bilingual-reader:viewer`）。
+阅读位置、窗口树（每栏语言 + 每根分隔条的比例）都记在 `localStorage`（`bilingual-reader:viewer`）。

@@ -20,12 +20,6 @@
   background-image: repeating-linear-gradient(180deg, var(--rule) 0 5px, transparent 5px 10px);
 }
 
-.gutter:hover::before,
-.gutter:focus-visible::before {
-  background-image: none;
-  background-color: var(--ink);
-}
-
 .gutter-grip {
   position: absolute;
   top: 50%;
@@ -35,11 +29,6 @@
   margin: -15px 0 0 -2px;
   border-radius: 2px;
   background: var(--rule);
-}
-
-.gutter:hover .gutter-grip,
-.gutter:focus-visible .gutter-grip {
-  background: var(--ink);
 }
 
 .gutter-read {
@@ -59,48 +48,51 @@
   pointer-events: none;
 }
 
+/* Stacked (vertical) splits: the same dashed boundary, laid on its side. */
+.split-col > .gutter {
+  cursor: row-resize;
+}
+
+.split-col > .gutter::before {
+  inset: 50% 0 auto 0;
+  width: auto;
+  height: 1px;
+  margin: -0.5px 0 0;
+  background-image: repeating-linear-gradient(90deg, var(--rule) 0 5px, transparent 5px 10px);
+}
+
+.split-col > .gutter .gutter-grip {
+  width: 30px;
+  height: 4px;
+  margin: -2px 0 0 -15px;
+}
+
+.split-col > .gutter .gutter-read {
+  transform: translate(-66px, -50%);
+}
+
+/* Hover, keyboard focus, and the divider the pointer is dragging. */
+.gutter:hover::before,
+.gutter:focus-visible::before,
+.gutter[data-separator='active']::before {
+  background-image: none;
+  background-color: var(--ink);
+}
+
+.gutter:hover .gutter-grip,
+.gutter:focus-visible .gutter-grip,
+.gutter[data-separator='active'] .gutter-grip {
+  background: var(--ink);
+}
+
 .gutter:hover .gutter-read,
 .gutter:focus-visible .gutter-read,
-body.is-dragging .gutter-read {
+.gutter[data-separator='active'] .gutter-read {
   opacity: 1;
 }
 
-body.is-dragging {
-  cursor: col-resize;
-  user-select: none;
-}
-
-body.is-dragging .gutter-read {
+.gutter[data-separator='active'] .gutter-read {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--sheet);
-}
-
-body.is-dragging .gutter-grip {
-  background: var(--ink);
-}
-
-/* Stacked (vertical) layout: the same dashed boundary, laid on its side. */
-@media (max-width: 900px) {
-  .gutter {
-    cursor: row-resize;
-  }
-
-  .gutter::before {
-    inset: 50% 0 auto 0;
-    width: auto;
-    height: 1px;
-    margin: -0.5px 0 0;
-    background-image: repeating-linear-gradient(90deg, var(--rule) 0 5px, transparent 5px 10px);
-  }
-
-  .gutter-grip {
-    width: 30px;
-    height: 4px;
-    margin: -2px 0 0 -15px;
-  }
-
-  .gutter-read {
-    transform: translate(-66px, -50%);
-  }
 }

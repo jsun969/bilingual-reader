@@ -9,8 +9,8 @@
   }
 }
 
-/* Below the desktop breakpoint the shelf becomes a drawer and the two panes
-   stack, each keeping its own scroll. */
+/* Below the desktop breakpoint the shelf becomes a drawer. Window splits keep
+   the direction the reader chose; each pane keeps its own scroll. */
 @media (max-width: 900px) {
   .workspace {
     grid-template-columns: minmax(0, 1fr);
@@ -48,6 +48,13 @@
 
   .brand-sub {
     display: none;
+  }
+
+  /* The reading column is a share of the pane; a phone pane is already narrow,
+     so the single pane keeps the full width here. */
+  .app[data-split='false'] .doc,
+  .app[data-split='false'] .doc-loading {
+    max-width: 100%;
   }
 
   .outline {

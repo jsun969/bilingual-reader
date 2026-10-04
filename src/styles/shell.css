@@ -82,6 +82,28 @@
   background: var(--paper-2);
 }
 
+.tool-btn:disabled {
+  color: var(--ink-faint);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tool-btn:disabled:hover {
+  border-color: var(--rule);
+  background: var(--sheet);
+}
+
+/* Window controls sit on the pane's own header: split right / split down / close. */
+.win-btn {
+  padding: 3px 7px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.tool-btn[hidden] {
+  display: none;
+}
+
 .tool-btn[aria-pressed='true'] {
   background: var(--ink);
   border-color: var(--ink);

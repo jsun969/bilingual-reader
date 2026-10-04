@@ -4,12 +4,10 @@ import type { Chapter } from '../types'
 interface TopBarProps {
   chapter: Chapter | undefined
   navOpen: boolean
-  split: boolean
   onToggleNav: () => void
-  onToggleSplit: () => void
 }
 
-export function TopBar({ chapter, navOpen, split, onToggleNav, onToggleSplit }: TopBarProps) {
+export function TopBar({ chapter, navOpen, onToggleNav }: TopBarProps) {
   return (
     <header className="topbar grid-bg">
       <button
@@ -33,15 +31,6 @@ export function TopBar({ chapter, navOpen, split, onToggleNav, onToggleSplit }: 
           </>
         ) : null}
       </p>
-      <button
-        className="tool-btn split-toggle"
-        type="button"
-        aria-pressed={split}
-        title={COPY.splitToggleTitle}
-        onClick={onToggleSplit}
-      >
-        {split ? COPY.splitOn : COPY.splitOff}
-      </button>
     </header>
   )
 }

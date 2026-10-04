@@ -1,5 +1,27 @@
 export type Lang = 'zh' | 'en' | 'pdf'
-export type Side = 'left' | 'right'
+
+/** A leaf of the layout tree: one window showing one language of the chapter. */
+export interface PaneLeaf {
+  kind: 'pane'
+  /** Stable id, unique in the tree; also the id prefix of this pane's document. */
+  id: string
+  lang: Lang
+}
+
+/** Split direction: two columns side by side (`row`) or two rows stacked (`col`). */
+export type SplitDir = 'row' | 'col'
+
+/** A split: `first` (left / top) and `second` (right / bottom), with `ratio` % for `first`. */
+export interface SplitNode {
+  kind: 'split'
+  id: string
+  dir: SplitDir
+  ratio: number
+  first: LayoutNode
+  second: LayoutNode
+}
+
+export type LayoutNode = PaneLeaf | SplitNode
 
 export interface MarkdownSource {
   /** URL the browser fetches the raw markdown from, e.g. /asset/chapter04-Processes/zh.md */
@@ -58,8 +80,6 @@ export interface ChapterDoc {
 
 export interface ViewState {
   chapter?: string
-  left: Lang
-  right: Lang
-  ratio: number
-  split: boolean
+  /** The window tree: every leaf is one pane, every split is one draggable divider. */
+  layout: LayoutNode
 }

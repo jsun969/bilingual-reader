@@ -9,7 +9,11 @@ const IDLE: ChapterDoc = { status: 'idle', html: '', outline: [], detail: '' }
  * Loads and renders the markdown for one pane. Results are cached per
  * pane/chapter/language, so flipping between 中文 and English never refetches.
  */
-export function useChapterDocument(chapter: Chapter | undefined, lang: Lang, side: 'left' | 'right'): ChapterDoc {
+export function useChapterDocument(
+  chapter: Chapter | undefined,
+  lang: Lang,
+  paneId: string,
+): ChapterDoc {
   const [doc, setDoc] = useState<ChapterDoc>(IDLE)
 
   useEffect(() => {
@@ -24,7 +28,7 @@ export function useChapterDocument(chapter: Chapter | undefined, lang: Lang, sid
       return
     }
 
-    const key = viewKey(side, chapter.slug, lang)
+    const key = viewKey(paneId, chapter.slug, lang)
     const cached = docCache.get(key)
     if (cached) {
       setDoc({ status: 'ready', html: cached.html, outline: cached.outline, detail: '' })
@@ -40,7 +44,7 @@ export function useChapterDocument(chapter: Chapter | undefined, lang: Lang, sid
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const text = await response.text()
         const rendered = await renderDoc(text, {
-          idPrefix: side === 'left' ? 'L-' : 'R-',
+          idPrefix: `${paneId}-`,
           assetUrl: new URL(source.path, location.href).href,
         })
         docCache.set(key, rendered)
@@ -52,7 +56,7 @@ export function useChapterDocument(chapter: Chapter | undefined, lang: Lang, sid
     })()
 
     return () => controller.abort()
-  }, [chapter, lang, side])
+  }, [chapter, lang, paneId])
 
   return doc
 }

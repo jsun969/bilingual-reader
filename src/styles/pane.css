@@ -64,7 +64,9 @@
 .pane-tools {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
   min-width: 0;
 }
 

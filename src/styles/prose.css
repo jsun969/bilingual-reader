@@ -24,7 +24,8 @@
   margin-top: 0;
 }
 
-/* Single pane: cap the line length and centre the column on the sheet. */
+/* Single pane: hold the line length to a share of the pane and centre the
+   column on the sheet. */
 .app[data-split='false'] .doc,
 .app[data-split='false'] .doc-loading {
   max-width: var(--measure);

@@ -1,17 +1,16 @@
 import { COPY } from '../copy'
 import { LANGS } from '../lib/config'
-import type { Chapter, Lang, Side } from '../types'
+import type { Chapter, Lang } from '../types'
 
 interface LanguageSwitchProps {
-  side: Side
   current: Lang
   sources: Chapter['sources'] | undefined
   onChange: (lang: Lang) => void
 }
 
-export function LanguageSwitch({ side, current, sources, onChange }: LanguageSwitchProps) {
+export function LanguageSwitch({ current, sources, onChange }: LanguageSwitchProps) {
   return (
-    <div className="switch" role="group" aria-label={COPY.langSwitchLabel(side)}>
+    <div className="switch" role="group" aria-label={COPY.langSwitchLabel}>
       {LANGS.map((lang) => {
         const available = Boolean(sources?.[lang])
         return (

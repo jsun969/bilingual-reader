@@ -1,34 +1,33 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Group, Panel } from 'react-resizable-panels'
 import { COPY } from './copy'
-import { DESKTOP_QUERY, RATIO_MIN, clampRatio } from './lib/config'
+import { DESKTOP_QUERY } from './lib/config'
 import { findChapter } from './lib/catalog'
+import { closePane, countPanes, setPaneLang, setSplitRatio, splitPane } from './lib/layout'
 import { useCatalog } from './hooks/useCatalog'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { useViewState } from './hooks/useViewState'
 import { ChapterShelf } from './components/ChapterShelf'
 import { FatalScreen } from './components/FatalScreen'
-import { Pane } from './components/Pane'
-import { SplitHandle } from './components/SplitHandle'
+import { LayoutView } from './components/LayoutView'
 import { TopBar } from './components/TopBar'
-import type { Lang, Side } from './types'
+import type { Chapter, Lang, SplitDir } from './types'
 
-const PANEL_MIN = `${RATIO_MIN}%`
+/** A new window opens on the other reading language when the chapter has one. */
+function nextLangFor(chapter: Chapter | undefined, from: Lang): Lang {
+  const other: Lang = from === 'zh' ? 'en' : 'zh'
+  if (chapter?.sources[other]) return other
+  return from
+}
 
 export function App() {
   const { catalog, status, detail } = useCatalog()
   const [view, updateView] = useViewState()
   const isDesktop = useMediaQuery(DESKTOP_QUERY)
   const [navOpen, setNavOpen] = useState(() => window.matchMedia(DESKTOP_QUERY).matches)
-  // The divider layout is read once; afterwards the library owns it and reports
-  // every change back into the persisted view state.
-  const [initialLayout] = useState(() => ({
-    left: clampRatio(view.ratio),
-    right: 100 - clampRatio(view.ratio),
-  }))
 
   const chapters = catalog.chapters
   const chapter = findChapter(chapters, view.chapter)
+  const paneCount = countPanes(view.layout)
 
   // A stale chapter (first run, or a chapter that moved) falls back to the first one.
   useEffect(() => {
@@ -51,9 +50,35 @@ export function App() {
     [updateView],
   )
 
-  const setLang = useCallback(
-    (side: Side, lang: Lang) => {
-      updateView(side === 'left' ? { left: lang } : { right: lang })
+  const changeLang = useCallback(
+    (paneId: string, lang: Lang) => {
+      updateView((previous) => ({ layout: setPaneLang(previous.layout, paneId, lang) }))
+    },
+    [updateView],
+  )
+
+  const addPane = useCallback(
+    (paneId: string, dir: SplitDir, lang: Lang) => {
+      updateView((previous) => ({
+        layout: splitPane(previous.layout, paneId, dir, nextLangFor(chapter, lang)),
+      }))
+    },
+    [chapter, updateView],
+  )
+
+  const removePane = useCallback(
+    (paneId: string) => {
+      updateView((previous) => {
+        const layout = closePane(previous.layout, paneId)
+        return layout ? { layout } : {}
+      })
+    },
+    [updateView],
+  )
+
+  const resizeSplit = useCallback(
+    (splitId: string, ratio: number) => {
+      updateView((previous) => ({ layout: setSplitRatio(previous.layout, splitId, ratio) }))
     },
     [updateView],
   )
@@ -79,13 +104,15 @@ export function App() {
   }
 
   return (
-    <div className="app" data-split={String(view.split)} data-nav={navOpen ? 'open' : 'closed'}>
+    <div
+      className="app"
+      data-split={paneCount > 1 ? 'true' : 'false'}
+      data-nav={navOpen ? 'open' : 'closed'}
+    >
       <TopBar
         chapter={chapter}
         navOpen={navOpen}
-        split={view.split}
         onToggleNav={() => setNavOpen((open) => !open)}
-        onToggleSplit={() => updateView({ split: !view.split })}
       />
       <div className="workspace">
         <ChapterShelf
@@ -95,44 +122,15 @@ export function App() {
           onSelect={selectChapter}
         />
         {navOpen && !isDesktop ? <div className="scrim" onClick={() => setNavOpen(false)} /> : null}
-        <Group
-          className="split"
-          orientation={isDesktop ? 'horizontal' : 'vertical'}
-          defaultLayout={initialLayout}
-          onLayoutChange={(layout) => {
-            if (!view.split || typeof layout.left !== 'number') return
-            updateView({ ratio: clampRatio(layout.left) })
-          }}
-        >
-          <Panel className="pane-slot" style={{ overflow: 'hidden' }} minSize={PANEL_MIN} id="left">
-            <Pane
-              side="left"
-              chapter={chapter}
-              lang={view.left}
-              split={view.split}
-              onLangChange={(lang) => setLang('left', lang)}
-            />
-          </Panel>
-          {view.split ? (
-            <>
-              <SplitHandle percentage={view.ratio} />
-              <Panel
-                className="pane-slot"
-                style={{ overflow: 'hidden' }}
-                minSize={PANEL_MIN}
-                id="right"
-              >
-                <Pane
-                  side="right"
-                  chapter={chapter}
-                  lang={view.right}
-                  split={view.split}
-                  onLangChange={(lang) => setLang('right', lang)}
-                />
-              </Panel>
-            </>
-          ) : null}
-        </Group>
+        <LayoutView
+          root={view.layout}
+          chapter={chapter}
+          paneCount={paneCount}
+          onLangChange={changeLang}
+          onSplit={addPane}
+          onClose={removePane}
+          onRatio={resizeSplit}
+        />
       </div>
     </div>
   )

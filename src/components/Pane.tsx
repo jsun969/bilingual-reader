@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { COPY } from '../copy'
-import { LANGS, PREFERS_REDUCED_MOTION } from '../lib/config'
+import { LANGS, MAX_PANES, PREFERS_REDUCED_MOTION } from '../lib/config'
 import { scrollMemory, viewKey } from '../lib/catalog'
 import { useChapterDocument } from '../hooks/useChapterDocument'
 import { useScrollSpy } from '../hooks/useScrollSpy'
@@ -10,19 +10,34 @@ import { LanguageSwitch } from './LanguageSwitch'
 import { Notice } from './Notice'
 import { OutlinePanel } from './OutlinePanel'
 import { PdfFrame } from './PdfFrame'
-import type { Chapter, Lang, Side } from '../types'
+import type { Chapter, Lang, SplitDir } from '../types'
 
 interface PaneProps {
-  side: Side
+  /** Stable window id: keys this pane's caches and prefixes its document ids. */
+  paneId: string
   chapter: Chapter | undefined
   lang: Lang
-  /** Both panes are side by side: no room for the outline panel here. */
-  split: boolean
+  /** This is the only window open, so there is room for the outline beside it. */
+  single: boolean
+  canSplit: boolean
+  canClose: boolean
   onLangChange: (lang: Lang) => void
+  onSplit: (dir: SplitDir) => void
+  onClose: () => void
 }
 
-export function Pane({ side, chapter, lang, split, onLangChange }: PaneProps) {
-  const doc = useChapterDocument(chapter, lang, side)
+export function Pane({
+  paneId,
+  chapter,
+  lang,
+  single,
+  canSplit,
+  canClose,
+  onLangChange,
+  onSplit,
+  onClose,
+}: PaneProps) {
+  const doc = useChapterDocument(chapter, lang, paneId)
   const [outlineOpen, setOutlineOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const docRef = useRef<HTMLElement>(null)
@@ -30,15 +45,15 @@ export function Pane({ side, chapter, lang, split, onLangChange }: PaneProps) {
   const isPdf = lang === 'pdf'
   const pdfSource = chapter?.sources.pdf
   const markdownSource = isPdf ? undefined : chapter?.sources[lang]
-  const key = chapter ? viewKey(side, chapter.slug, lang) : lang
-  const canOutline = !isPdf && !split && doc.outline.length > 1
+  const key = chapter ? viewKey(paneId, chapter.slug, lang) : lang
+  const canOutline = !isPdf && single && doc.outline.length > 1
   const showOutline = outlineOpen && doc.status === 'ready' && canOutline
   const ids = useMemo(() => doc.outline.map((item) => item.id), [doc.outline])
   const activeId = useScrollSpy({ scrollRef, docRef, ids, enabled: showOutline })
 
   useEffect(() => {
-    if (isPdf || split) setOutlineOpen(false)
-  }, [isPdf, split])
+    if (isPdf || !single) setOutlineOpen(false)
+  }, [isPdf, single])
 
   // Remember where this pane/chapter/language was left, and restore it on return.
   const lastOffset = useRef(0)
@@ -109,14 +124,9 @@ export function Pane({ side, chapter, lang, split, onLangChange }: PaneProps) {
   }
 
   return (
-    <section className="pane" data-side={side} data-lang={lang}>
+    <section className="pane" data-lang={lang}>
       <header className="pane-top" key={key}>
-        <LanguageSwitch
-          side={side}
-          current={lang}
-          sources={chapter?.sources}
-          onChange={onLangChange}
-        />
+        <LanguageSwitch current={lang} sources={chapter?.sources} onChange={onLangChange} />
         <div className="pane-tools">
           {isPdf && pdfSource ? (
             <a
@@ -138,6 +148,36 @@ export function Pane({ side, chapter, lang, split, onLangChange }: PaneProps) {
             onClick={() => setOutlineOpen((open) => !open)}
           >
             {COPY.outlineToggle}
+          </button>
+          <button
+            className="tool-btn win-btn"
+            type="button"
+            disabled={!canSplit}
+            title={canSplit ? COPY.splitRightTitle : COPY.paneLimitTitle(MAX_PANES)}
+            aria-label={COPY.splitRightTitle}
+            onClick={() => onSplit('row')}
+          >
+            {COPY.splitRight}
+          </button>
+          <button
+            className="tool-btn win-btn"
+            type="button"
+            disabled={!canSplit}
+            title={canSplit ? COPY.splitDownTitle : COPY.paneLimitTitle(MAX_PANES)}
+            aria-label={COPY.splitDownTitle}
+            onClick={() => onSplit('col')}
+          >
+            {COPY.splitDown}
+          </button>
+          <button
+            className="tool-btn win-btn"
+            type="button"
+            hidden={!canClose}
+            title={COPY.closePaneTitle}
+            aria-label={COPY.closePaneTitle}
+            onClick={onClose}
+          >
+            {COPY.closePane}
           </button>
         </div>
       </header>
