@@ -2,8 +2,8 @@ import type { Lang } from './types'
 
 /** Interface copy, in the reader's language. One place, so it stays consistent. */
 export const COPY = {
-  appName: 'OSTEP',
-  appSubtitle: 'Operating Systems: Three Easy Pieces',
+  appName: '双语阅读器',
+  appSubtitle: 'Bilingual Reader',
   shelfTitle: '章节目录',
   shelfScanning: (assetDir: string) => `正在扫描 ${assetDir}/ …`,
   shelfCount: (assetDir: string, count: number) => `${count} 章 · 目录 ${assetDir}/`,

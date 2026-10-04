@@ -1,13 +1,13 @@
 import { createHighlighter } from 'shiki'
 import type { BundledLanguage, Highlighter } from 'shiki'
-import { OSTEP_THEME, OSTEP_THEME_NAME } from './shikiTheme'
+import { INK_THEME, INK_THEME_NAME } from './shikiTheme'
 
 let highlighterPromise: Promise<Highlighter> | null = null
 const languageLoads = new Map<string, Promise<void | null>>()
 
 function getHighlighter(): Promise<Highlighter> {
   // No grammars up front: each one is pulled in the first time a chapter uses it.
-  highlighterPromise ??= createHighlighter({ themes: [OSTEP_THEME], langs: [] })
+  highlighterPromise ??= createHighlighter({ themes: [INK_THEME], langs: [] })
   return highlighterPromise
 }
 
@@ -31,7 +31,7 @@ export async function highlightCode(code: string, language: string): Promise<str
   }
   if ((await loading) === null) return null
 
-  const html = highlighter.codeToHtml(code, { lang: language, theme: OSTEP_THEME_NAME })
+  const html = highlighter.codeToHtml(code, { lang: language, theme: INK_THEME_NAME })
   const holder = document.createElement('template')
   holder.innerHTML = html
   const tokens = holder.content.firstElementChild?.querySelector('code')

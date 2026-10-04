@@ -8,7 +8,7 @@ export const PREFERS_REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion
 
 export const LANGS: readonly Lang[] = ['zh', 'en', 'pdf']
 
-const STORE_KEY = 'ostep:viewer'
+const STORE_KEY = 'bilingual-reader:viewer'
 
 export const DEFAULT_VIEW: ViewState = {
   left: 'zh',

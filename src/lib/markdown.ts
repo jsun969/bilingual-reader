@@ -83,7 +83,7 @@ export async function renderDoc(
         .find((name) => name.startsWith('language-'))
         ?.slice('language-'.length)
       const text = code.textContent ?? ''
-      // Unlabelled fences are the book's ASCII diagrams; leave them alone.
+      // Unlabelled fences are usually ASCII diagrams; leave them alone.
       if (!language || text.length > 120_000) return
       const highlighted = await highlightCode(text, language)
       if (highlighted === null) return

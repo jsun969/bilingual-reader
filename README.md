@@ -4,7 +4,7 @@
 左侧是章节目录。切到单栏时正文列会加宽并居中，栏内可以再展开本章大纲；分屏时每栏更窄，
 不显示大纲入口。
 
-素材按「一章一个目录」组织即可，放哪套文档都行（当前放的是 OSTEP 各章）。
+素材按「一章一个目录」组织即可，放哪套文档都行（比如 OSTEP 各章）。
 
 ## 运行
 
@@ -51,4 +51,4 @@ asset/                          # 也可以是 assets/，不入库（见 .gitign
 - **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
   单栏的中文行宽 54rem、英文 50rem 并居中；分栏时正文铺满栏宽。
 
-阅读位置、分栏比例、两栏语言都记在 `localStorage`（`ostep:viewer`）。
+阅读位置、分栏比例、两栏语言都记在 `localStorage`（`bilingual-reader:viewer`）。

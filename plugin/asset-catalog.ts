@@ -225,7 +225,7 @@ export function assetCatalog(): Plugin {
   }
 
   return {
-    name: 'ostep:asset-catalog',
+    name: 'bilingual-reader:asset-catalog',
 
     configResolved(config) {
       projectRoot = config.root

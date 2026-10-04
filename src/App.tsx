@@ -39,8 +39,8 @@ export function App() {
 
   useEffect(() => {
     document.title = chapter
-      ? `${chapter.num ? `${Number(chapter.num)}. ` : ''}${chapter.title} · OSTEP`
-      : 'OSTEP 阅读器'
+      ? `${chapter.num ? `${Number(chapter.num)}. ` : ''}${chapter.title} · ${COPY.appName}`
+      : COPY.appName
   }, [chapter])
 
   const selectChapter = useCallback(

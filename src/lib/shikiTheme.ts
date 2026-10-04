@@ -4,7 +4,7 @@
  * Shiki does the tokenizing; these colours keep highlighted code inside the same
  * palette as the rest of the page (see `--code-*` in styles/tokens.css).
  */
-export const OSTEP_THEME_NAME = 'ostep-ink'
+export const INK_THEME_NAME = 'reader-ink'
 
 const COMMENT = '#69737F'
 const KEYWORD = '#8C2F6B'
@@ -16,8 +16,8 @@ const COPY = '#1F2937'
 const PUNCTUATION = '#57626F'
 const INVALID = '#A9351F'
 
-export const OSTEP_THEME = {
-  name: OSTEP_THEME_NAME,
+export const INK_THEME = {
+  name: INK_THEME_NAME,
   type: 'light' as const,
   colors: {
     // Mirrors --paper-2; only used if the block is rendered by shiki itself.
