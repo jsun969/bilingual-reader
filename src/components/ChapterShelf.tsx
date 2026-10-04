@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { COPY } from '../copy'
 import { ChapterRow } from './ChapterRow'
 import type { Catalog } from '../types'
@@ -7,11 +8,13 @@ interface ChapterShelfProps {
   status: 'loading' | 'ready' | 'error'
   current: string | undefined
   onSelect: (slug: string) => void
+  /** The floating panel itself: the workspace watches presses outside it. */
+  ref?: Ref<HTMLElement>
 }
 
-export function ChapterShelf({ catalog, status, current, onSelect }: ChapterShelfProps) {
+export function ChapterShelf({ catalog, status, current, onSelect, ref }: ChapterShelfProps) {
   return (
-    <aside className="shelf grid-bg">
+    <aside className="shelf grid-bg" ref={ref}>
       <div className="shelf-head">
         <p className="shelf-title">{COPY.shelfTitle}</p>
         <p className="shelf-meta">

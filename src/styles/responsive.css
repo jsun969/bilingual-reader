@@ -17,8 +17,9 @@
   }
 
   .scrim {
-    position: fixed;
-    inset: var(--topbar-h) 0 0;
+    display: block;
+    position: absolute;
+    inset: 0;
     z-index: 24;
     background: rgba(18, 26, 36, 0.3);
   }

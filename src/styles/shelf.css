@@ -29,6 +29,12 @@
   transition: transform 0.22s ease, visibility 0s 0.22s;
 }
 
+/* Dim layer for the shelf on small screens: it keeps a tap from reaching the
+   pane behind, and the press itself is what closes the shelf (see App). */
+.scrim {
+  display: none;
+}
+
 .shelf-head {
   padding: 14px 16px 11px;
   border-bottom: 1px solid var(--rule);
