@@ -36,10 +36,10 @@ export function App() {
       : COPY.appName
   }, [chapter])
 
-  // On small screens the shelf is a drawer, so picking a chapter closes it.
+  // The shelf floats over the text, so picking a chapter puts it away again.
   const selectChapter = (slug: string) => {
     openChapter(slug)
-    if (!isDesktop) setNavOpen(false)
+    setNavOpen(false)
   }
 
   if (status === 'error') {

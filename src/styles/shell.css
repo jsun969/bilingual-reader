@@ -130,15 +130,10 @@
 }
 
 .workspace {
+  position: relative;
   display: grid;
-  grid-template-columns: var(--shelf-w) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   min-height: 0;
-}
-
-.app[data-nav='closed'] .workspace {
-  grid-template-columns: 0 minmax(0, 1fr);
-}
-
-.app[data-nav='closed'] .shelf {
-  visibility: hidden;
+  /* The shelf is an overlay and starts off-canvas; clip it so no scrollbar. */
+  overflow: hidden;
 }

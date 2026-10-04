@@ -1,9 +1,32 @@
+/* The shelf floats over the reading surface instead of owning a column, so the
+   panes keep the full width. Its paper is translucent and blurs what is behind
+   it — `86%` is the knob for how much text shows through. */
 .shelf {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  z-index: 26;
+  width: var(--shelf-w);
   min-height: 0;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--rule);
+  background-color: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: 8px 0 26px rgba(18, 26, 36, 0.1);
   overflow: hidden;
+  transform: translateX(-103%);
+  transition: transform 0.22s ease, visibility 0s;
+}
+
+.app[data-nav='open'] .shelf {
+  transform: none;
+}
+
+/* Off-canvas: out of the tab order, but still slides out before it disappears. */
+.app[data-nav='closed'] .shelf {
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0s 0.22s;
 }
 
 .shelf-head {
