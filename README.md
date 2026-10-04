@@ -54,4 +54,6 @@ asset/                          # 也可以是 assets/，不入库（见 .gitign
 - **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
   单栏的中文正文列宽占栏宽 75%、英文 70% 并居中（≤900px 的手机上铺满整栏）；多栏时正文铺满栏宽。
 
-阅读位置、窗口树（每栏语言 + 每根分隔条的比例）都记在 `localStorage`（`bilingual-reader:viewer`）。
+持久化的只有当前章节和窗口树：`localStorage` 一个键 `bilingual-reader:viewer`，值就是
+`{ chapter, layout }`（栏数、上下/左右结构、每栏语言、每根分隔条的比例都在 `layout` 里）。
+阅读位置和已渲染的正文只留在内存（`src/lib/catalog.ts` 的 `scrollMemory` / `docCache`），刷新后从章节开头开始。
