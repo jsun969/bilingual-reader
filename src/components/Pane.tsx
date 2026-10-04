@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { COPY } from '../copy'
 import { LANGS, MAX_PANES, PREFERS_REDUCED_MOTION } from '../lib/config'
-import { scrollMemory, viewKey } from '../lib/catalog'
+import { viewKey } from '../lib/catalog'
+import { useViewerStore } from '../lib/store'
 import { useChapterDocument } from '../hooks/useChapterDocument'
 import { useScrollSpy } from '../hooks/useScrollSpy'
 import { DocumentView } from './DocumentView'
@@ -56,28 +57,31 @@ export function Pane({
   }, [isPdf, single])
 
   // Remember where this pane/chapter/language was left, and restore it on return.
-  const lastOffset = useRef(0)
+  const lastOffset = useRef({ key: '', top: 0 })
+  const rememberScroll = useViewerStore((state) => state.rememberScroll)
 
   useEffect(() => {
     const element = scrollRef.current
     if (!element) return
-    element.scrollTop = scrollMemory.get(key) ?? 0
+    // Read imperatively: scrolling must not re-render every pane.
+    element.scrollTop = useViewerStore.getState().scroll[key] ?? 0
   }, [key, doc.html])
 
   useEffect(() => {
     const element = scrollRef.current
     if (!element) return
     const remember = () => {
-      lastOffset.current = element.scrollTop
-      scrollMemory.set(key, element.scrollTop)
+      lastOffset.current = { key, top: element.scrollTop }
+      rememberScroll(key, element.scrollTop)
     }
     element.addEventListener('scroll', remember, { passive: true })
     return () => {
       element.removeEventListener('scroll', remember)
-      // A switch can land in the same frame as a scroll, before the event fires.
-      scrollMemory.set(key, lastOffset.current)
+      // A switch can land in the same frame as a scroll, before the event fires —
+      // but only this key's own offset may be written.
+      if (lastOffset.current.key === key) rememberScroll(key, lastOffset.current.top)
     }
-  }, [key])
+  }, [key, rememberScroll])
 
   const jump = useCallback((id: string) => {
     const scroll = scrollRef.current

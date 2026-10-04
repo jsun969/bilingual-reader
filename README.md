@@ -49,11 +49,22 @@ asset/                          # 也可以是 assets/，不入库（见 .gitign
 - **代码高亮**（`src/lib/highlighter.ts`）：shiki，按需加载语法，主题用页面自己的油墨色
   （`src/lib/shikiTheme.ts`）。没有标注语言的代码块保持原样 —— 那些是书里的 ASCII 图。
 - **窗口**：窗口树（`src/types.ts` 的 `LayoutNode`，每个叶子是一栏、每个分支是一根可拖拽的分隔条）
-  由 `src/lib/layout.ts` 增删改，`src/components/LayoutView.tsx` 递归渲染成嵌套的
+  由 `src/lib/layout.ts` 的纯函数增删改，`src/components/LayoutView.tsx` 递归渲染成嵌套的
   `react-resizable-panels` 组，拖拽、键盘和分隔条语义都由它负责。
+- **状态**：一个 zustand store（`src/lib/store.ts` 的 `useViewerStore`）持有当前章节、窗口树、
+  每栏的阅读位置，只暴露动作：`openChapter` / `addPane` / `removePane` / `changeLang` /
+  `resizeSplit` / `rememberScroll`。拖动分隔条和滚动都直接调用动作，组件之间不传状态回调。
 - **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
   单栏的中文正文列宽占栏宽 75%、英文 70% 并居中（≤900px 的手机上铺满整栏）；多栏时正文铺满栏宽。
 
-持久化的只有当前章节和窗口树：`localStorage` 一个键 `bilingual-reader:viewer`，值就是
-`{ chapter, layout }`（栏数、上下/左右结构、每栏语言、每根分隔条的比例都在 `layout` 里）。
-阅读位置和已渲染的正文只留在内存（`src/lib/catalog.ts` 的 `scrollMemory` / `docCache`），刷新后从章节开头开始。
+## 持久化
+
+`localStorage` 只有一个键 `bilingual-reader:viewer`，由 `zustand/persist` 写入：
+`{ state: { chapter, layout, scroll }, version }`。
+
+- `chapter`：当前章节；`layout`：窗口树（栏数、上下/左右结构、每栏语言、每根分隔条的比例）。
+- `scroll`：`paneId/章节/语言` → scrollTop，即每栏各自的阅读位置，最多保留最近读过的 200 条。
+- 写盘走一个 250ms 节流的 storage 适配器：滚动和拖分隔条都是每帧改状态，节流后最多每 250ms
+  落一次盘，标签页隐藏 / 关闭（`pagehide`）时立即补写一次。写不进去（隐私模式、配额）就退回纯内存。
+- 旧格式（`left`/`right`/`ratio`/`split` 那次改版前的）会在读取时迁移成窗口树，不会丢章节和语言。
+- 已渲染的正文（`src/lib/catalog.ts` 的 `docCache`）和目录/大纲抽屉的开合只在内存里。
