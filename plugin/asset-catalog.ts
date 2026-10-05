@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
-import type { Catalog, Chapter } from '../src/types.ts'
+import type { Catalog, Chapter, MarkdownSource } from '../src/types.ts'
 
 /**
  * Serves the asset folder (one directory per chapter) plus a chapter catalog
@@ -93,6 +93,7 @@ function scan(assetRoot: string, urlBase: string): Catalog {
     }
 
     const sources: Chapter['sources'] = {}
+    let adhd: MarkdownSource | undefined
     for (const name of names) {
       if (name.startsWith('.')) continue
       const ext = path.extname(name).toLowerCase()
@@ -100,6 +101,17 @@ function scan(assetRoot: string, urlBase: string): Catalog {
 
       if (ext === '.md') {
         const stem = path.basename(name, ext).toLowerCase()
+        if (stem === 'adhd') {
+          try {
+            adhd = {
+              path: url,
+              minutes: readingMinutes(fs.readFileSync(path.join(dir, name), 'utf8')),
+            }
+          } catch {
+            /* unreadable, skip */
+          }
+          continue
+        }
         if (stem !== 'zh' && stem !== 'en') continue
         try {
           sources[stem] = {
@@ -126,6 +138,7 @@ function scan(assetRoot: string, urlBase: string): Catalog {
       num: match?.[1] ?? '',
       order: match ? Number(match[1]) : Number.MAX_SAFE_INTEGER,
       title: prettifySlug(match?.[2] || entry.name),
+      ...(adhd ? { adhd } : {}),
       sources,
     })
   }

@@ -44,6 +44,12 @@ export interface Chapter {
   order: number
   /** Human title derived from the directory name, e.g. "Processes". */
   title: string
+  /**
+   * Optional condensed rendition of the chapter, English, meant to be skimmed
+   * in a panel of its own. Not a language: it sits beside `sources`, and a
+   * chapter without it simply has no such panel.
+   */
+  adhd?: MarkdownSource
   sources: {
     zh?: MarkdownSource
     en?: MarkdownSource

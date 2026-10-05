@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { LuColumns2, LuExternalLink, LuListTree, LuRows2, LuX } from 'react-icons/lu'
+import { LuColumns2, LuExternalLink, LuListTree, LuRows2, LuX, LuZap } from 'react-icons/lu'
 import { COPY } from '../copy'
 import { LANGS, MAX_PANES, PREFERS_REDUCED_MOTION } from '../lib/config'
 import { viewKey } from '../lib/catalog'
 import { useViewerStore } from '../lib/store'
-import { useChapterDocument } from '../hooks/useChapterDocument'
+import { useAdhdDocument, useChapterDocument } from '../hooks/useChapterDocument'
 import { useScrollSpy } from '../hooks/useScrollSpy'
+import { AdhdPanel } from './AdhdPanel'
 import { DocumentView } from './DocumentView'
 import { LanguageSwitch } from './LanguageSwitch'
 import { Notice } from './Notice'
@@ -37,7 +38,9 @@ export function Pane({
   onClose,
 }: PaneProps) {
   const doc = useChapterDocument(chapter, lang, paneId)
+  const adhd = useAdhdDocument(chapter, paneId)
   const [outlineOpen, setOutlineOpen] = useState(false)
+  const [adhdOpen, setAdhdOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const docRef = useRef<HTMLElement>(null)
   const mainRef = useRef<HTMLDivElement>(null)
@@ -49,6 +52,10 @@ export function Pane({
   const key = chapter ? viewKey(paneId, chapter.slug, lang) : lang
   const canOutline = !isPdf && doc.outline.length > 1
   const showOutline = outlineOpen && doc.status === 'ready' && canOutline
+  // The condensed rendition belongs to the chapter, not to this pane's language,
+  // so it is available for the PDF original too and keys off the chapter alone.
+  const adhdKey = chapter ? viewKey(paneId, chapter.slug, 'adhd') : 'adhd'
+  const canAdhd = Boolean(chapter?.adhd)
   const ids = useMemo(() => doc.outline.map((item) => item.id), [doc.outline])
   const activeId = useScrollSpy({ scrollRef, docRef, ids, enabled: showOutline })
 
@@ -172,6 +179,17 @@ export function Pane({
           <button
             className="tool-btn icon-btn"
             type="button"
+            aria-pressed={adhdOpen}
+            disabled={!canAdhd}
+            aria-label={COPY.adhdToggleTitle}
+            title={canAdhd ? COPY.adhdToggleTitle : COPY.adhdMissing}
+            onClick={() => setAdhdOpen((open) => !open)}
+          >
+            <LuZap />
+          </button>
+          <button
+            className="tool-btn icon-btn"
+            type="button"
             disabled={!canSplit}
             title={canSplit ? COPY.splitRightTitle : COPY.paneLimitTitle(MAX_PANES)}
             aria-label={COPY.splitRightTitle}
@@ -214,6 +232,10 @@ export function Pane({
             open={showOutline}
             onJump={jump}
           />
+        ) : null}
+        {/* Mounted while the chapter has one, so opening it slides rather than pops. */}
+        {canAdhd ? (
+          <AdhdPanel doc={adhd} open={adhdOpen} docKey={adhdKey} />
         ) : null}
       </div>
     </section>

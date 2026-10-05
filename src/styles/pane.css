@@ -193,14 +193,16 @@
 
 .pane-scroll::-webkit-scrollbar,
 .chapters::-webkit-scrollbar,
-.outline::-webkit-scrollbar {
+.outline::-webkit-scrollbar,
+.adhd-body::-webkit-scrollbar {
   width: 11px;
   height: 11px;
 }
 
 .pane-scroll::-webkit-scrollbar-thumb,
 .chapters::-webkit-scrollbar-thumb,
-.outline::-webkit-scrollbar-thumb {
+.outline::-webkit-scrollbar-thumb,
+.adhd-body::-webkit-scrollbar-thumb {
   background: var(--rule);
   border: 3px solid transparent;
   background-clip: content-box;
@@ -209,7 +211,8 @@
 
 .pane-scroll::-webkit-scrollbar-thumb:hover,
 .chapters::-webkit-scrollbar-thumb:hover,
-.outline::-webkit-scrollbar-thumb:hover {
+.outline::-webkit-scrollbar-thumb:hover,
+.adhd-body::-webkit-scrollbar-thumb:hover {
   background: var(--ink-faint);
   background-clip: content-box;
 }
