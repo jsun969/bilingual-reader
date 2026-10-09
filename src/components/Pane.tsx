@@ -186,7 +186,7 @@ export function Pane({
             aria-pressed={adhdOpen}
             disabled={!canAdhd}
             aria-label={COPY.adhdToggleTitle}
-            title={canAdhd ? COPY.adhdToggleTitle : COPY.adhdMissing}
+            title={canAdhd ? COPY.adhdToggleTitle : COPY.adhdMissingTitle}
             onClick={() => setAdhdOpen((open) => !open)}
           >
             <LuZap />

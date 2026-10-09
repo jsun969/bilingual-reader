@@ -1,5 +1,6 @@
 import type { Ref } from 'react'
-import { COPY } from '../copy'
+import { LuExternalLink } from 'react-icons/lu'
+import { ADHD_SKILL_URL, COPY } from '../copy'
 import type { ChapterDoc } from '../types'
 
 interface AdhdPanelProps {
@@ -22,7 +23,20 @@ interface AdhdPanelProps {
 export function AdhdPanel({ doc, open, docKey, ref }: AdhdPanelProps) {
   return (
     <aside className="adhd" data-open={open} ref={ref}>
-      <p className="adhd-head">{COPY.adhdTitle}</p>
+      <div className="adhd-head">
+        <span className="adhd-title">{COPY.adhdTitle}</span>
+        {/* The file is never generated here: point at the skill that writes it. */}
+        <a
+          className="adhd-source"
+          href={ADHD_SKILL_URL}
+          target="_blank"
+          rel="noreferrer"
+          title={COPY.adhdSourceTitle}
+        >
+          {COPY.adhdSource}
+          <LuExternalLink />
+        </a>
+      </div>
       <div className="adhd-body">
         {doc.status === 'ready' ? (
           <article

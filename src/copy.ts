@@ -1,5 +1,11 @@
 import type { Lang } from './types'
 
+/**
+ * The skill that turns a chapter into `adhd.md`. The reader has to run it
+ * themselves — the reader never generates it, it only displays the file.
+ */
+export const ADHD_SKILL_URL = 'https://github.com/ayghri/i-have-adhd'
+
 /** Interface copy, in the reader's language. One place, so it stays consistent. */
 export const COPY = {
   appName: '双语阅读器',
@@ -24,7 +30,9 @@ export const COPY = {
   outlineToggleTitle: '显示本栏的大纲',
   adhdTitle: 'ADHD',
   adhdToggleTitle: 'ADHD 速览：本章的压缩版',
-  adhdMissing: '本章没有 ADHD 速览。',
+  adhdMissingTitle: `本章没有 ADHD 速览：自己跑一遍 ${ADHD_SKILL_URL}，把生成的 adhd.md 放进章节文件夹。`,
+  adhdSource: 'i-have-adhd',
+  adhdSourceTitle: 'ADHD 速览不是素材自带的：自己跑一遍 i-have-adhd，把生成的 adhd.md 放进章节文件夹',
   openPdf: '原件',
   openPdfTitle: '在新标签页打开原件',
   navToggle: '目录',

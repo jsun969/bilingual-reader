@@ -30,7 +30,7 @@ src/
 chapter08-Multi-level-Feedback/     # 名字随便，章节号/名由读者填
   zh.md                             # 中文（可选）
   en.md                             # English（可选）
-  adhd.md                           # 可选，英文压缩速览，不算一种语言
+  adhd.md                           # 可选，英文压缩速览（自己跑 i-have-adhd 生成），不算一种语言
   origin.pdf                        # 可选，任意 *.pdf；多个时取文件名字典序第一个
   images/fig-8-2.png                # 可选，markdown 里的相对路径
 ```
@@ -39,6 +39,8 @@ chapter08-Multi-level-Feedback/     # 名字随便，章节号/名由读者填
   `.md` 取 stem（小写）`zh` / `en` / `adhd`，其它 `.md` 忽略；`.pdf` 取文件名字典序第一个并记录字节数。
 - `zh.md` / `en.md` / `*.pdf` **至少有一个**，一个都没有就抛 `ImportError`，弹窗报错、不导入。
   **只有 `adhd.md` 不算可用**（沿用旧版服务端行为）。缺哪个，对应栏的按钮就禁用并说明原因。
+- `adhd.md` 由**读者自己**用 [i-have-adhd](https://github.com/ayghri/i-have-adhd) 生成后放进章节文件夹：
+  阅读器只显示、从不生成它（`ADHD_SKILL_URL`，`src/copy.ts`；面板抬头那个链接和禁用按钮的提示都指向它）。
 - 要加第三种语言要动三处：`src/lib/fs.ts` 的文件名识别、`src/types.ts` 的 `Lang`、`src/copy.ts` 的标签。
 - 阅读时长 `readingMinutes()`（`src/lib/reading.ts`）：~420 汉字/分钟 + ~230 拉丁词/分钟，先剔除代码块和标签，最小 1。
 
