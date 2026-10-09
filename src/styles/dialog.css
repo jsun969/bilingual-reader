@@ -63,6 +63,19 @@
   color: var(--ink-soft);
 }
 
+/* The one link in the list (the skill that writes adhd.md): `a` inherits colour
+   globally, so it needs its own underline to read as clickable. */
+.dialog-format a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 2px;
+}
+
+.dialog-format a:hover {
+  text-decoration-color: currentColor;
+}
+
 .dialog-format-tip {
   margin-top: 7px;
   font-size: 11.5px;

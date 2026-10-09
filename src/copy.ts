@@ -64,12 +64,17 @@ export const COPY = {
   dialogRenameTitle: '重命名这一章',
   dialogRelinkTitle: '重新选择文件夹',
   dialogFormatTitle: '文件夹格式',
+  /* 每行是若干片段拼的：字符串就是纯文本，`{ label, href }` 渲染成链接。 */
   dialogFormatLines: [
-    'zh.md —— 中文章节（可选）',
-    'en.md —— English chapter（可选）',
-    'adhd.md —— 可选，英文压缩速览',
-    '任意一个 *.pdf —— 可选，原件',
-    'images/ —— 可选，markdown 里相对路径引用的图片',
+    ['zh.md —— 中文章节（可选）'],
+    ['en.md —— English chapter（可选）'],
+    [
+      'adhd.md —— ADHD 速览（可选，推荐用 ',
+      { label: 'ADHD Skill', href: ADHD_SKILL_URL },
+      ' 生成）',
+    ],
+    ['任意一个 *.pdf —— 可选，原件'],
+    ['images/ —— 可选，markdown 里相对路径引用的图片'],
   ],
   dialogFormatTip: 'zh.md / en.md / *.pdf 至少要有一个；缺哪个，对应的按钮就不可用。',
   dialogPick: '选择文件夹',

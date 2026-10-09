@@ -178,8 +178,18 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
             <div className="dialog-format">
               <p className="dialog-format-title">{COPY.dialogFormatTitle}</p>
               <ul>
-                {COPY.dialogFormatLines.map((line) => (
-                  <li key={line}>{line}</li>
+                {COPY.dialogFormatLines.map((parts, index) => (
+                  <li key={index}>
+                    {parts.map((part, i) =>
+                      typeof part === 'string' ? (
+                        part
+                      ) : (
+                        <a key={i} href={part.href} target="_blank" rel="noreferrer">
+                          {part.label}
+                        </a>
+                      ),
+                    )}
+                  </li>
                 ))}
               </ul>
               <p className="dialog-format-tip">{COPY.dialogFormatTip}</p>
