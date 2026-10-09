@@ -3,6 +3,7 @@
 @import './base.css';
 @import './shell.css';
 @import './shelf.css';
+@import './dialog.css';
 @import './pane.css';
 @import './gutter.css';
 @import './outline.css';
