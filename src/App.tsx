@@ -62,7 +62,7 @@ export function App() {
 
   useEffect(() => {
     document.title = chapter
-      ? `${chapter.num ? `${Number(chapter.num)}. ` : ''}${chapter.title} · ${COPY.appName}`
+      ? `${chapter.num ? `${chapter.num}. ` : ''}${chapter.title} · ${COPY.appName}`
       : COPY.appName
   }, [chapter])
 

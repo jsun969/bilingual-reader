@@ -1,11 +1,11 @@
 /* The import / rename / relink dialog: one card, the same ink-on-paper
    instrument look as the rest of the chrome. */
 .dialog {
-  padding: 0;
+  padding: 16px;
   border: 0;
-  max-width: none;
-  max-height: none;
-  overflow: visible;
+  max-width: 100vw;
+  max-height: 100dvh;
+  overflow: auto;
   background: transparent;
 }
 

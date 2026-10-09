@@ -115,6 +115,10 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
   }
 
   const submit = async () => {
+    if (mode !== 'import' && !chapter) {
+      onClose()
+      return
+    }
     const name = title.trim()
     if (!name) {
       setError(COPY.nameRequired)

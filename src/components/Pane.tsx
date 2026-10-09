@@ -127,6 +127,7 @@ export function Pane({
 
   const renderBody = (): ReactNode => {
     if (!chapter) return <Notice title={COPY.noChapterTitle} sub={COPY.noChapterSub} />
+    if (chapter.status === 'loading') return <p className="doc-loading">{COPY.loading}</p>
     if (chapter.status !== 'ready') {
       return <Notice title={COPY.unreadableTitle} sub={COPY.unreadableSub(chapter.title)} />
     }
