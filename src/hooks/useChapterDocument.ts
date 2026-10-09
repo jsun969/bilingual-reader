@@ -1,27 +1,33 @@
 import { useEffect, useState } from 'react'
 import type { Chapter, ChapterDoc, Lang, MarkdownSource } from '../types'
-import { docCache, viewKey } from '../lib/catalog'
+import { docCache, pdfUrls, viewKey } from '../lib/docs'
+import { assetUrl, fileUrl, readText } from '../lib/fs'
 import { renderDoc } from '../lib/markdown'
 
 const IDLE: ChapterDoc = { status: 'idle', html: '', outline: [], detail: '' }
 const MISSING: ChapterDoc = { status: 'missing', html: '', outline: [], detail: '' }
 
 /**
- * Loads and renders one markdown source. Results are cached under `cacheKey`, so
- * flipping between 中文 and English — or reopening the ADHD panel — never refetches.
- * `missing` tells the difference between "nothing is selected" (idle) and "this
- * chapter simply has no such file" (missing, which the pane explains).
+ * Loads and renders one markdown file out of the chapter's folder. Results are
+ * cached under `cacheKey`, so flipping between 中文 and English — or reopening
+ * the ADHD panel — never reads the file twice. `missing` tells the difference
+ * between "nothing is selected" (idle) and "this chapter has no such file"
+ * (missing, which the pane explains).
  */
 function useRenderedDoc(
+  chapter: Chapter | undefined,
   source: MarkdownSource | undefined,
   cacheKey: string | undefined,
   idPrefix: string,
   missing: boolean,
 ): ChapterDoc {
   const [doc, setDoc] = useState<ChapterDoc>(IDLE)
+  const id = chapter?.id
+  const handle = chapter?.handle
+  const name = source?.name
 
   useEffect(() => {
-    if (!source || !cacheKey) {
+    if (!id || !handle || !name || !cacheKey) {
       setDoc(missing ? MISSING : IDLE)
       return
     }
@@ -32,28 +38,31 @@ function useRenderedDoc(
       return
     }
 
-    const controller = new AbortController()
+    // Reading a local file is fast but not instant, and the reader may switch
+    // chapters mid-read; a flag is all the cancellation this needs.
+    let cancelled = false
     setDoc({ status: 'loading', html: '', outline: [], detail: '' })
 
     void (async () => {
       try {
-        const response = await fetch(source.path, { signal: controller.signal })
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const text = await response.text()
+        const text = await readText(handle, name)
         const rendered = await renderDoc(text, {
           idPrefix,
-          assetUrl: new URL(source.path, location.href).href,
+          resolveAsset: (src) => assetUrl(handle, id, src),
         })
+        if (cancelled) return
         docCache.set(cacheKey, rendered)
         setDoc({ status: 'ready', html: rendered.html, outline: rendered.outline, detail: '' })
       } catch (error) {
-        if (controller.signal.aborted) return
+        if (cancelled) return
         setDoc({ status: 'error', html: '', outline: [], detail: String(error) })
       }
     })()
 
-    return () => controller.abort()
-  }, [source, cacheKey, idPrefix, missing])
+    return () => {
+      cancelled = true
+    }
+  }, [id, handle, name, cacheKey, idPrefix, missing])
 
   return doc
 }
@@ -68,8 +77,9 @@ export function useChapterDocument(
   const markdown = lang === 'zh' || lang === 'en'
   const source = chapter && markdown ? chapter.sources[lang] : undefined
   return useRenderedDoc(
+    chapter,
     source,
-    chapter && markdown ? viewKey(paneId, chapter.slug, lang) : undefined,
+    chapter && markdown ? viewKey(paneId, chapter.id, lang) : undefined,
     `${paneId}-`,
     Boolean(chapter) && !isPdf,
   )
@@ -81,9 +91,58 @@ export function useChapterDocument(
  */
 export function useAdhdDocument(chapter: Chapter | undefined, paneId: string): ChapterDoc {
   return useRenderedDoc(
+    chapter,
     chapter?.adhd,
-    chapter ? viewKey(paneId, chapter.slug, 'adhd') : undefined,
+    chapter ? viewKey(paneId, chapter.id, 'adhd') : undefined,
     `${paneId}-adhd-`,
     false,
   )
+}
+
+export interface PdfDoc {
+  /** Blob URL of the original, handed to the browser's own PDF viewer. */
+  url?: string
+  detail: string
+}
+
+/** The chapter's PDF as a blob URL, minted once per chapter for the session. */
+export function usePdfDocument(chapter: Chapter | undefined): PdfDoc {
+  const [state, setState] = useState<PdfDoc>({ detail: '' })
+  const id = chapter?.id
+  const handle = chapter?.handle
+  const name = chapter?.sources.pdf?.name
+
+  useEffect(() => {
+    if (!id || !handle || !name) {
+      setState({ detail: '' })
+      return
+    }
+
+    const cached = pdfUrls.get(id)
+    if (cached) {
+      setState({ url: cached, detail: '' })
+      return
+    }
+
+    let cancelled = false
+    void (async () => {
+      try {
+        const url = await fileUrl(handle, name)
+        if (cancelled) {
+          URL.revokeObjectURL(url)
+          return
+        }
+        pdfUrls.set(id, url)
+        setState({ url, detail: '' })
+      } catch (error) {
+        if (!cancelled) setState({ detail: String(error) })
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [id, handle, name])
+
+  return state
 }

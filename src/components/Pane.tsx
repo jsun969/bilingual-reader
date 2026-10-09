@@ -3,9 +3,9 @@ import type { ReactNode } from 'react'
 import { LuColumns2, LuExternalLink, LuListTree, LuRows2, LuX, LuZap } from 'react-icons/lu'
 import { COPY } from '../copy'
 import { LANGS, MAX_PANES, PREFERS_REDUCED_MOTION } from '../lib/config'
-import { viewKey } from '../lib/catalog'
+import { viewKey } from '../lib/docs'
 import { useViewerStore } from '../lib/store'
-import { useAdhdDocument, useChapterDocument } from '../hooks/useChapterDocument'
+import { useAdhdDocument, useChapterDocument, usePdfDocument } from '../hooks/useChapterDocument'
 import { useScrollSpy } from '../hooks/useScrollSpy'
 import { AdhdPanel } from './AdhdPanel'
 import { DocumentView } from './DocumentView'
@@ -39,6 +39,7 @@ export function Pane({
 }: PaneProps) {
   const doc = useChapterDocument(chapter, lang, paneId)
   const adhd = useAdhdDocument(chapter, paneId)
+  const pdf = usePdfDocument(chapter)
   const [outlineOpen, setOutlineOpen] = useState(false)
   const [adhdOpen, setAdhdOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -49,12 +50,12 @@ export function Pane({
   const isPdf = lang === 'pdf'
   const pdfSource = chapter?.sources.pdf
   const markdownSource = isPdf ? undefined : chapter?.sources[lang]
-  const key = chapter ? viewKey(paneId, chapter.slug, lang) : lang
+  const key = chapter ? viewKey(paneId, chapter.id, lang) : lang
   const canOutline = !isPdf && doc.outline.length > 1
   const showOutline = outlineOpen && doc.status === 'ready' && canOutline
   // The condensed rendition belongs to the chapter, not to this pane's language,
   // so it is available for the PDF original too and keys off the chapter alone.
-  const adhdKey = chapter ? viewKey(paneId, chapter.slug, 'adhd') : 'adhd'
+  const adhdKey = chapter ? viewKey(paneId, chapter.id, 'adhd') : 'adhd'
   const canAdhd = Boolean(chapter?.adhd)
   const ids = useMemo(() => doc.outline.map((item) => item.id), [doc.outline])
   const activeId = useScrollSpy({ scrollRef, docRef, ids, enabled: showOutline })
@@ -127,11 +128,10 @@ export function Pane({
   const renderBody = (): ReactNode => {
     if (!chapter) return <Notice title={COPY.noChapterTitle} sub={COPY.noChapterSub} />
     if (isPdf) {
-      return pdfSource ? (
-        <PdfFrame path={pdfSource.path} />
-      ) : (
-        <Notice title={COPY.missingSource('pdf')} sub={suggestion} />
-      )
+      if (!pdfSource) return <Notice title={COPY.missingSource('pdf')} sub={suggestion} />
+      if (pdf.detail) return <Notice title={COPY.loadFailedTitle} sub={pdf.detail} />
+      if (!pdf.url) return <p className="doc-loading">{COPY.loading}</p>
+      return <PdfFrame path={pdf.url} />
     }
     if (doc.status === 'loading' || doc.status === 'idle') {
       return <p className="doc-loading">{COPY.loading}</p>
@@ -141,7 +141,7 @@ export function Pane({
       return (
         <Notice
           title={COPY.loadFailedTitle}
-          sub={COPY.loadFailedSub(markdownSource?.path ?? key, doc.detail)}
+          sub={COPY.loadFailedSub(markdownSource?.name ?? key, doc.detail)}
         />
       )
     }
@@ -153,10 +153,10 @@ export function Pane({
       <header className="pane-top" key={key}>
         <LanguageSwitch current={lang} sources={chapter?.sources} onChange={onLangChange} />
         <div className="pane-tools">
-          {isPdf && pdfSource ? (
+          {isPdf && pdf.url ? (
             <a
               className="tool-link"
-              href={pdfSource.path}
+              href={pdf.url}
               target="_blank"
               rel="noreferrer"
               title={COPY.openPdfTitle}

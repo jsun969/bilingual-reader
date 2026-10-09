@@ -33,7 +33,11 @@ function claimId(prefix: string, candidate: string, used: Set<string>): string {
  */
 export async function renderDoc(
   source: string,
-  options: { idPrefix: string; assetUrl: string },
+  options: {
+    idPrefix: string
+    /** Resolves a markdown-relative image path to a URL, or `undefined` if absent. */
+    resolveAsset: (src: string) => Promise<string | undefined>
+  },
 ): Promise<RenderedDoc> {
   const template = document.createElement('template')
   template.innerHTML = md.parse(source, { async: false }) as string
@@ -60,14 +64,19 @@ export async function renderDoc(
     outline.push({ id, level: Number(heading.tagName[1]), text })
   }
 
-  for (const image of frag.querySelectorAll<HTMLImageElement>('img')) {
-    const src = image.getAttribute('src') ?? ''
-    if (src && !/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(src)) {
-      image.setAttribute('src', new URL(src, options.assetUrl).pathname)
-    }
-    image.loading = 'lazy'
-    image.decoding = 'async'
-  }
+  await Promise.all(
+    [...frag.querySelectorAll<HTMLImageElement>('img')].map(async (image) => {
+      const src = image.getAttribute('src') ?? ''
+      // Relative paths point inside the chapter folder, not the page: the caller
+      // resolves them against the imported directory (blob URL or nothing).
+      if (src && !/^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(src)) {
+        const url = await options.resolveAsset(src)
+        if (url) image.setAttribute('src', url)
+      }
+      image.loading = 'lazy'
+      image.decoding = 'async'
+    }),
+  )
 
   for (const link of frag.querySelectorAll<HTMLAnchorElement>('a[href]')) {
     const href = link.getAttribute('href')!
