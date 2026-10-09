@@ -143,7 +143,14 @@ export const useLibraryStore = create<LibraryStore>()((set, get) => {
       const restored: Chapter[] = []
       // Sequential: one folder at a time keeps the disk busy, not the tab.
       for (const meta of metas) restored.push(await restoreOne(meta))
-      const chapters = sortChapters(restored)
+      // The shelf stays usable while this runs: keep whatever was imported or
+      // removed in the meantime instead of overwriting it with the boot list.
+      const restoredIds = new Set(restored.map((chapter) => chapter.id))
+      const live = new Set(get().chapters.map((chapter) => chapter.id))
+      const chapters = sortChapters([
+        ...restored.filter((chapter) => live.has(chapter.id)),
+        ...get().chapters.filter((chapter) => !restoredIds.has(chapter.id)),
+      ])
       set({ chapters, restoring: false })
       persist(chapters)
     },
