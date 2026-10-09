@@ -127,6 +127,9 @@ export function Pane({
 
   const renderBody = (): ReactNode => {
     if (!chapter) return <Notice title={COPY.noChapterTitle} sub={COPY.noChapterSub} />
+    if (chapter.status !== 'ready') {
+      return <Notice title={COPY.unreadableTitle} sub={COPY.unreadableSub(chapter.title)} />
+    }
     if (isPdf) {
       if (!pdfSource) return <Notice title={COPY.missingSource('pdf')} sub={suggestion} />
       if (pdf.detail) return <Notice title={COPY.loadFailedTitle} sub={pdf.detail} />

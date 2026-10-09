@@ -92,6 +92,15 @@ interface LibraryStore {
   makeReady: (id: string) => Promise<'ready' | 'relink' | 'denied'>
 }
 
+/**
+ * The chapter list comes out of `localStorage` synchronously, so the shelf is
+ * already populated on the first paint; only the folder handles need a round
+ * trip through IndexedDB, which `restore()` does once.
+ */
+const booted: Chapter[] = readMetas().map((meta) => ({ ...meta, status: 'loading' }))
+
+let started = false
+
 export const useLibraryStore = create<LibraryStore>()((set, get) => {
   const persist = (chapters: Chapter[]): void => {
     writeMetas(chapters.map(toMeta))
@@ -119,11 +128,12 @@ export const useLibraryStore = create<LibraryStore>()((set, get) => {
   }
 
   return {
-    chapters: [],
-    restoring: false,
+    chapters: booted,
+    restoring: booted.length > 0,
 
     restore: async () => {
-      if (get().restoring) return
+      if (started) return
+      started = true
       const metas = readMetas()
       if (!metas.length) {
         set({ restoring: false, chapters: [] })

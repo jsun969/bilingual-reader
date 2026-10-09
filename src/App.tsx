@@ -1,49 +1,64 @@
 import { useEffect, useRef, useState } from 'react'
 import { COPY } from './copy'
-import { findChapter } from './lib/catalog'
+import { findChapter } from './lib/docs'
 import { countPanes } from './lib/layout'
+import { useLibraryStore } from './lib/library'
 import { useViewerStore } from './lib/store'
-import { useCatalog } from './hooks/useCatalog'
 import { ChapterShelf } from './components/ChapterShelf'
-import { FatalScreen } from './components/FatalScreen'
+import { ImportDialog } from './components/ImportDialog'
+import type { DialogState } from './components/ImportDialog'
 import { LayoutView } from './components/LayoutView'
 import { TopBar } from './components/TopBar'
 
 export function App() {
-  const { catalog, status, detail } = useCatalog()
-  const chapterSlug = useViewerStore((state) => state.chapter)
+  const chapters = useLibraryStore((state) => state.chapters)
+  const restoring = useLibraryStore((state) => state.restoring)
+  const restore = useLibraryStore((state) => state.restore)
+  const makeReady = useLibraryStore((state) => state.makeReady)
+  const removeChapter = useLibraryStore((state) => state.removeChapter)
+
+  const chapterId = useViewerStore((state) => state.chapter)
   const layout = useViewerStore((state) => state.layout)
   const openChapter = useViewerStore((state) => state.openChapter)
+
   // Closed by default: the shelf floats over the text now, so it only appears
-  // when asked for. Reopening it on every reload was the desktop default.
+  // when asked for — except on an empty shelf, where the import button lives.
   const [navOpen, setNavOpen] = useState(false)
+  const [dialog, setDialog] = useState<DialogState | null>(null)
   const workspaceRef = useRef<HTMLDivElement>(null)
   const shelfRef = useRef<HTMLElement>(null)
 
-  const chapters = catalog.chapters
-  const chapter = findChapter(chapters, chapterSlug)
+  const chapter = findChapter(chapters, chapterId)
+  const shelfOpen = navOpen || (chapters.length === 0 && !restoring)
   const multiPane = countPanes(layout) > 1
+
+  // Once per load: check every stored folder handle against the disk.
+  useEffect(() => {
+    void restore()
+  }, [restore])
 
   // Pressing anywhere but the shelf itself puts it away. The listener sits on the
   // workspace, so the top bar's 目录 button — outside this element — keeps its own
   // toggle, and the wheel over the text still scrolls the text.
   useEffect(() => {
     const workspace = workspaceRef.current
-    if (!navOpen || !workspace) return
+    if (!shelfOpen || !workspace) return
     const onPointerDown = (event: PointerEvent) => {
       if (event.target instanceof Node && shelfRef.current?.contains(event.target)) return
       setNavOpen(false)
     }
     workspace.addEventListener('pointerdown', onPointerDown)
     return () => workspace.removeEventListener('pointerdown', onPointerDown)
-  }, [navOpen])
+  }, [shelfOpen])
 
-  // A stale chapter (first run, or a chapter that moved) falls back to the first one.
+  // A chapter that is no longer on the shelf (first run, or one just removed)
+  // falls back to the first readable one, then to the first one at all.
   useEffect(() => {
-    if (status !== 'ready' || chapters.length === 0) return
-    if (chapters.some((candidate) => candidate.slug === chapterSlug)) return
-    openChapter(chapters[0].slug)
-  }, [status, chapters, chapterSlug, openChapter])
+    if (restoring || chapters.length === 0) return
+    if (chapters.some((candidate) => candidate.id === chapterId)) return
+    const fallback = chapters.find((candidate) => candidate.status === 'ready') ?? chapters[0]
+    openChapter(fallback.id)
+  }, [restoring, chapters, chapterId, openChapter])
 
   useEffect(() => {
     document.title = chapter
@@ -51,54 +66,56 @@ export function App() {
       : COPY.appName
   }, [chapter])
 
-  // The shelf floats over the text, so picking a chapter puts it away again.
-  const selectChapter = (slug: string) => {
-    openChapter(slug)
+  // The shelf floats over the text, so picking a chapter puts it away again —
+  // after making sure its folder is actually readable.
+  const selectChapter = async (id: string) => {
+    const result = await makeReady(id)
+    if (result === 'relink') setDialog({ mode: 'relink', id })
+    else if (result === 'ready') openChapter(id)
     setNavOpen(false)
   }
 
-  if (status === 'error') {
-    return (
-      <FatalScreen
-        title={COPY.catalogFailedTitle}
-        sub={COPY.catalogFailedSub(catalog.assetDir)}
-        detail={COPY.catalogFailedDetail(detail)}
-      />
-    )
+  const remove = async (id: string) => {
+    const target = chapters.find((candidate) => candidate.id === id)
+    if (!target || !window.confirm(COPY.removeConfirm(target.title))) return
+    await removeChapter(id)
   }
 
-  if (status === 'ready' && chapters.length === 0) {
-    return (
-      <FatalScreen
-        title={COPY.catalogEmptyTitle(catalog.assetDir)}
-        sub={COPY.catalogEmptySub}
-        detail={COPY.catalogEmptyDetail(catalog.assetDir)}
-      />
-    )
-  }
+  const dialogChapter =
+    dialog && dialog.mode !== 'import' ? chapters.find((c) => c.id === dialog.id) : undefined
 
   return (
     <div
       className="app"
       data-split={multiPane ? 'true' : 'false'}
-      data-nav={navOpen ? 'open' : 'closed'}
+      data-nav={shelfOpen ? 'open' : 'closed'}
     >
       <TopBar
         chapter={chapter}
-        navOpen={navOpen}
+        navOpen={shelfOpen}
         onToggleNav={() => setNavOpen((open) => !open)}
       />
       <div className="workspace" ref={workspaceRef}>
         <ChapterShelf
           ref={shelfRef}
-          catalog={catalog}
-          status={status}
-          current={chapter?.slug}
-          onSelect={selectChapter}
+          chapters={chapters}
+          restoring={restoring}
+          current={chapter?.id}
+          onSelect={(id) => void selectChapter(id)}
+          onRename={(id) => setDialog({ mode: 'rename', id })}
+          onRemove={(id) => void remove(id)}
+          onImport={() => setDialog({ mode: 'import' })}
         />
-        {navOpen ? <div className="scrim" /> : null}
+        {shelfOpen ? <div className="scrim" /> : null}
         <LayoutView root={layout} chapter={chapter} />
       </div>
+      {dialog ? (
+        <ImportDialog
+          mode={dialog.mode}
+          chapter={dialogChapter}
+          onClose={() => setDialog(null)}
+        />
+      ) : null}
     </div>
   )
 }
