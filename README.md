@@ -1,17 +1,25 @@
-# bilingual-reader
+# 📖 双语阅读器
 
-多窗格双语文档阅读器：每一栏都可以单独在 **中文 / 原文 Markdown / 原件 PDF** 之间切换，
-章节目录浮在正文之上（半透明 + 背景模糊，不占版面，默认收起，由顶栏「目录」开合，选完章节自动收起）。
-栏头上有五个图标按钮：**本栏大纲**（`LuListTree`）、**ADHD 速览**（`LuZap`）、
-**向右分栏**（`LuColumns2`）、**向下分栏**（`LuRows2`）、**关闭这一栏**（`LuX`），
-所以可以平铺成左右 / 上下任意组合，最多 4 栏。大纲同样浮在栏的右缘、不占正文宽度，分屏时每栏都能各开各的；
-ADHD 速览从栏的底缘滑上来（同样不占版面，见下），没有 `adhd.md` 的章节按钮为禁用态；
-只剩一栏时正文列加宽并居中，多栏时每栏更窄。
+`bilingual-reader` —— **中文 / 原文 Markdown / 原件 PDF** 三种视图并排对照的多窗格阅读器，最多 4 栏，
+左右 / 上下任意组合，每栏各自记住阅读位置。
 
-它是一个**通用阅读器**：没有服务器、没有固定的素材目录，章节由读者在浏览器里**导入本地文件夹**得到，
-所以放哪套文档都行（比如 OSTEP 各章）。
+素材不用打包进项目，也不依赖服务器：在浏览器里**导入本地文件夹**（一章一个文件夹，类似 VSCode 网页版的
+「打开文件夹」），章节号、章节名随手填，书架记在本地，下次打开还在。
 
-## 运行
+<!-- 截图：放好后取消下面两行注释 -->
+<!-- ![bilingual-reader](screenshot.png) -->
+
+## ✨ 能做什么
+
+- **三种视图** —— 每栏都能在「中文 / English / 原件 PDF」之间切换，缺哪种就禁用并说明原因。
+- **任意分栏** —— 一键向右 / 向下拆分，最多 4 栏，分隔条可拖；每栏的视图、大纲开合、阅读位置互不干扰。
+- **目录** —— 浮在正文之上（半透明 + 背景模糊），不占版面，默认收起，选完章节自动收起。
+- **本栏大纲** —— 同样浮在栏的右缘，不占正文宽度；分屏时每栏各开各的。
+- **ADHD 速览** —— 从栏底滑上来的独立浮层，放章节的压缩版（英文），可以一边看速览一边滚正文。
+- **导入文件夹** —— 拖拽或选择文件夹，按章累积成一本「书」；章节号用于排序，两个字段都能改。
+  文件夹被移动 / 删除 / 收回权限时会在书架上标出来，可以重新选择或移除，不会静默丢章节。
+
+## 🚀 运行
 
 ```bash
 pnpm install
@@ -20,104 +28,10 @@ pnpm dev        # http://localhost:5273
 
 其他命令：`pnpm build`（类型检查 + 打包到 `dist/`）、`pnpm preview`（预览打包结果）。
 
-导入文件夹用的是 **File System Access API**，只有 Chrome / Edge 等 Chromium 浏览器可用；
-其它浏览器里「导入文件夹」按钮为禁用态并说明原因。
+## 🌐 浏览器
 
-## 导入素材
+需要 **Chrome / Edge**：导入本地文件夹用的是 File System Access API，其它浏览器里那个按钮会禁用并说明原因。
 
-打开左侧「目录」，点底部的**「导入文件夹」**，弹窗里可以**拖拽文件夹**进来，也可以点**「选择文件夹」**。
-**一个文件夹 = 一章**，弹窗里填 **Chapter no**（用于排序，可留空）和 **Chapter name**。
+---
 
-选定文件夹后会用**文件夹名预填**这两个字段（见 `src/lib/naming.ts`）：Chapter no 取名字里**第一个数字**
-（`23-xxx`、`23-18-alkdjf29` 都是 `23`）；Chapter name 去掉所有数字、把 `-` / `_` / 空格换成空格，
-每个单词首字母大写（`23-xxx` → `Xxx`，`chapter08-Multi-level-Feedback` → `Chapter Multi Level Feedback`）。
-两个字段都可以改，**改过的字段不会被下一次选文件夹覆盖**；只解析首次导入，重命名和重新选择文件夹不动这两个值。
-
-文件夹里的文件名是固定的，代码里没有任何章节名：
-
-```
-你导入的文件夹/
-  zh.md                       # 中文
-  en.md                       # English
-  adhd.md                     # 可选：英文速览（从 en.md 压缩）
-  origin.pdf                  # 可选：原件（任意一个 *.pdf 都可以）
-  images/fig-8-2.png          # 可选，markdown 里的相对路径
-```
-
-- `zh.md` / `en.md` 分别对应「中文」「English」，任意 `*.pdf` 对应「原件」。
-  **至少要有其中一个**：一个都没有就报错，不会导入；缺哪个，哪一栏的按钮就禁用并说明原因。
-  要加第三种语言，需要动三处：`src/lib/fs.ts` 的文件名识别、`src/types.ts` 的 `Lang`、
-  `src/copy.ts` 的标签。
-- `adhd.md` 是可选的一份**压缩速览**（英文，从 `en.md` 提炼），不算一种语言：它挂在 `Chapter.adhd`
-  上，由栏头的 `LuZap` 按钮开成一个独立浮层。哪一章没有这个文件，哪一章的按钮就禁用。
-- 章节列表按 Chapter no 排序，没有数字的排在最后；章节行尾有**重命名**和**移除**两个按钮，
-  多次导入会累积成同一本书的多个章节。
-
-## 持久化
-
-三处存储，各管一段：
-
-- `localStorage` `bilingual-reader:viewer`，由 `zustand/persist` 写入：
-  `{ state: { chapter, layout, scroll }, version }`。
-  - `chapter`：当前章节 id；`layout`：窗口树（栏数、上下/左右结构、每栏语言、每根分隔条的比例）。
-  - `scroll`：`paneId/章节 id/语言` → scrollTop，即每栏各自的阅读位置，最多保留最近读过的 200 条。
-  - 写盘走一个 250ms 节流的 storage 适配器：滚动和拖分隔条都是每帧改状态，节流后最多每 250ms
-    落一次盘，标签页隐藏 / 关闭（`pagehide`）时立即补写一次。写不进去（隐私模式、配额）就退回纯内存。
-  - 旧格式（`left`/`right`/`ratio`/`split` 那次改版前的）会在读取时迁移成窗口树，不会丢章节和语言。
-- `localStorage` `bilingual-reader:library`：章节清单（id、Chapter no/name、识别到的文件名与时长）。
-  启动时**同步**读出来，书架上先有列表，再去核对文件夹。
-- **IndexedDB** `bilingual-reader` → `folders`：每个章节的 `FileSystemDirectoryHandle`。
-  句柄不能被 JSON 化，只能放在这里（这是唯一一处没用 `localStorage` 的持久化）。
-
-刷新后 `restore()` 会依次核对每个句柄：浏览器已授权就静默重扫文件夹；需要授权就把该章标成
-**「需要授权」**（点它一次即可，Chromium 只在用户手势里给权限）；文件夹被移动、删除或改名则标成
-**「文件夹不可用」**，该章在侧边栏里可以**重新选择文件夹**或**移除**。
-另外正文/配图/PDF 都是临时的 blob URL（不落盘），每次进入页面重新生成。
-
-## 工作原理
-
-- **文件夹**（`src/lib/fs.ts`）：`showDirectoryPicker()` 选目录、`DataTransferItem.getAsFileSystemHandle()`
-  接拖拽；`scanChapter()` 扫一章：识别 `zh.md` / `en.md` / `adhd.md` / 任意 `*.pdf`，读出 markdown 估算
-  阅读时长；`assetUrl()` 把正文里 `images/fig-8-2.png` 这类相对路径解析成文件夹里的 blob URL。
-- **书库**（`src/lib/library.ts`）：一个 zustand store 持有章节列表，负责导入 / 重命名 / 移除 / 重新链接 /
-  授权，并把元数据写回 `localStorage`、句柄写回 IndexedDB。`src/lib/idb.ts` 是那张句柄表。
-- **渲染**（`src/lib/markdown.ts`）：marked + marked-footnote 解析 markdown，随后在 DOM 上做几件事：
-  给每栏的 id 加前缀（栏的 id，如 `p1-`），这样多栏显示同一章时锚点、脚注、图号引用都不会串；
-  用回调把图片相对路径解析成 blob URL；把 `#fig-4-1` 这类文内引用指向正确的元素。
-- **代码高亮**（`src/lib/highlighter.ts`）：shiki，按需加载语法，主题用页面自己的油墨色
-  （`src/lib/shikiTheme.ts`）。没有标注语言的代码块保持原样 —— 那些是书里的 ASCII 图。
-- **窗口**：窗口树（`src/types.ts` 的 `LayoutNode`，每个叶子是一栏、每个分支是一根可拖拽的分隔条）
-  由 `src/lib/layout.ts` 的纯函数增删改，`src/components/LayoutView.tsx` 递归渲染成嵌套的
-  `react-resizable-panels` 组，拖拽、键盘和分隔条语义都由它负责。
-- **状态**：一个 zustand store（`src/lib/store.ts` 的 `useViewerStore`）持有当前章节、窗口树、
-  每栏的阅读位置，只暴露动作：`openChapter` / `addPane` / `removePane` / `changeLang` /
-  `resizeSplit` / `rememberScroll`。拖动分隔条和滚动都直接调用动作，组件之间不传状态回调。
-- **版式**：`src/styles/`，按职责拆成 tokens / base / 各组件 / prose / responsive。
-  单栏的中文正文列宽占栏宽 75%、英文 70% 并居中（≤900px 的手机上铺满整栏）；多栏时正文铺满栏宽。
-- **导入弹窗**（`src/components/ImportDialog.tsx`）：原生 `<dialog>`（焦点陷阱和 Esc 关闭都是白送的），
-  一个组件管三种用法 —— 导入新章节、重命名、把丢了文件夹的章节重新指到别处。
-- **目录**：`.shelf` 是 `.workspace` 里的绝对定位浮层（`position: absolute`，不占网格列），
-  底色是 `--paper` 按 `--glass-opacity`（tokens.css，默认 65%）透出来 + `backdrop-filter: blur(12px)`，
-  连当前章节那行的高亮也是半透明白，整块读起来才是一层玻璃而不是贴了一张纸；
-  开合用 `data-nav` 切换 `transform`，关闭时 `visibility: hidden` 让开合动画走完又不留在 tab 顺序里。
-  书架为空时目录强制开着，导入按钮就在底部。关掉它的方式：顶栏「目录」、选章节、点浮层以外的任何地方——
-  `.workspace` 上挂了 `pointerdown` 监听，落在 `.shelf` 之外的按下就关（用 ref 判断，不查 class）；
-  顶栏在 `.workspace` 之外，所以「目录」按钮自己的 toggle 不受影响，滚轮也照常滚正文。
-  手机端另有一层 `.scrim` 只负责压暗和挡住穿透。
-- **大纲**：`.outline` 同样是浮层，绝对定位在 `.pane-main` 的右缘（`width: min(226px, 75%)`），
-  所以正文始终占满栏宽；和目录共用 `--glass-opacity`，连开合动画也一致（`data-open` 切 `transform`，
-  关闭时延迟 `visibility`，从右缘滑进滑出——面板在可用时保持挂载，只有切换章节/language 导致大纲消失才卸载）。
-  粘性标题条用比面板更不透明的底色，免得条目从它底下滚过去时透出来。
-  开关是栏头的 `LuListTree` 图标，每栏各存一份开合状态（Pane 里的 `useState`，刷新即收起）。
-  关掉它的方式和目录一致：再点一次图标，或者点本栏正文——`.pane-main` 上挂了 `pointerdown`，
-  落在 `.outline` 之外的按下就关（用 ref 判断）；监听挂在 `.pane-main` 而不是整个栏，
-  所以栏头的图标按钮不受影响，多栏时也只关自己那一份。点大纲条目跳转不会关（可以连着跳几节）。
-  分屏时不再有条件限制：只要本栏是 markdown 且有多个标题就能开。
-- **ADHD 速览**：`.adhd` 也是浮层，绝对定位在 `.pane-main` 的**底缘**（`inset-inline: 0; bottom: 0`，
-  高度 `55%`），从下往上滑进滑出，和目录/大纲同一块玻璃、同一套时长，但**自己带滚动条**
-  （`.adhd-body`），正文列不会被压窄。它和别处相反：**不**监听空白处的按下，只有栏头的 `LuZap`
-  按钮能关掉它，所以可以一边点着、滚着后面的正文一边看。章节没有 `adhd.md` 时按钮禁用并说明原因；
-  有的话面板常驻挂载（只为滑动动画），内容按 `paneId/adhd` 缓存，标题 id 前缀是 `<paneId>-adhd-`，
-  不会和正文的锚点撞号。它是按章走的，不受本栏语言影响（看原件 PDF 时也能开）。
-- **图标**：一律来自 `react-icons/lu`（Lucide），不用字符图标。按钮共用 `.tool-btn`
-  （固定 26px 高，和语言切换器一行对齐），纯图标按钮再加 `.icon-btn`，图标尺寸在 CSS 里统一给。
+想改代码、想知道素材格式和存储结构，看 **[CONTEXT.md](./CONTEXT.md)**。
