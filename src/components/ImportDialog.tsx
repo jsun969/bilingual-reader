@@ -4,6 +4,7 @@ import { LuFolderOpen } from 'react-icons/lu'
 import { COPY } from '../copy'
 import { ImportError, droppedDirectory, pickDirectory, pickerSupported, scanChapter } from '../lib/fs'
 import { useLibraryStore } from '../lib/library'
+import { parseFolderName } from '../lib/naming'
 import { useViewerStore } from '../lib/store'
 import type { Chapter, ChapterFiles } from '../types'
 
@@ -53,6 +54,8 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [num, setNum] = useState(chapter?.num ?? '')
   const [title, setTitle] = useState(chapter?.title ?? '')
+  /** Once a field was typed in, picking another folder must not overwrite it. */
+  const touched = useRef({ num: false, title: false })
   const [dir, setDir] = useState<FileSystemDirectoryHandle>()
   const [files, setFiles] = useState<ChapterFiles>()
   const [error, setError] = useState('')
@@ -65,25 +68,35 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
     if (dialog && !dialog.open) dialog.showModal()
   }, [])
 
-  const acceptFolder = useCallback(async (handle: FileSystemDirectoryHandle) => {
-    setBusy(true)
-    setError('')
-    try {
-      const scanned = await scanChapter(handle)
-      setDir(handle)
-      setFiles(scanned)
-    } catch (failure) {
-      setDir(undefined)
-      setFiles(undefined)
-      setError(
-        failure instanceof ImportError
-          ? COPY.dialogNoFiles
-          : COPY.folderFailed(failure instanceof Error ? failure.message : String(failure)),
-      )
-    } finally {
-      setBusy(false)
-    }
-  }, [])
+  const acceptFolder = useCallback(
+    async (handle: FileSystemDirectoryHandle) => {
+      setBusy(true)
+      setError('')
+      try {
+        const scanned = await scanChapter(handle)
+        setDir(handle)
+        setFiles(scanned)
+        // Importing starts from blank fields, so they can be filled from the
+        // folder name; renaming and relinking keep whatever the reader typed.
+        if (mode === 'import') {
+          const parsed = parseFolderName(handle.name)
+          if (!touched.current.num) setNum(parsed.num)
+          if (!touched.current.title) setTitle(parsed.title)
+        }
+      } catch (failure) {
+        setDir(undefined)
+        setFiles(undefined)
+        setError(
+          failure instanceof ImportError
+            ? COPY.dialogNoFiles
+            : COPY.folderFailed(failure instanceof Error ? failure.message : String(failure)),
+        )
+      } finally {
+        setBusy(false)
+      }
+    },
+    [mode],
+  )
 
   const choose = async () => {
     try {
@@ -207,7 +220,10 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
             className="field-input"
             value={num}
             placeholder={COPY.numPlaceholder}
-            onChange={(event) => setNum(event.target.value)}
+            onChange={(event) => {
+              touched.current.num = true
+              setNum(event.target.value)
+            }}
           />
         </label>
         <label className="field">
@@ -217,7 +233,10 @@ export function ImportDialog({ mode, chapter, onClose }: ImportDialogProps) {
             value={title}
             placeholder={COPY.namePlaceholder}
             autoFocus
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(event) => {
+              touched.current.title = true
+              setTitle(event.target.value)
+            }}
           />
         </label>
         <p className="dialog-hint">{COPY.numHint}</p>
