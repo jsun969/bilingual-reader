@@ -3,6 +3,7 @@ dist/
 .DS_Store
 *.log
 
-# 阅读素材（各章 markdown / PDF / 配图）不入库，放在本地即可
+# 本地阅读素材（各章 markdown / PDF / 配图）：现在由浏览器导入文件夹读取，
+# 但仍然不入库，放在本地即可
 asset/
 assets/
