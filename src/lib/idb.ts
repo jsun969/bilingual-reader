@@ -34,8 +34,8 @@ function openDb(): Promise<IDBDatabase> {
       if (!req.result.objectStoreNames.contains(HANDLES)) req.result.createObjectStore(HANDLES)
     }
     req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error ?? new Error('无法打开 IndexedDB'))
-    req.onblocked = () => reject(new Error('IndexedDB 被其他标签页占用'))
+    req.onerror = () => reject(req.error ?? new Error('打不开 IndexedDB'))
+    req.onblocked = () => reject(new Error('IndexedDB 已被另一个标签页占用'))
   })
   return dbPromise
 }

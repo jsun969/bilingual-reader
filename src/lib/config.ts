@@ -13,7 +13,7 @@ const RATIO_CENTER = 50
 /** Smallest share of a split one of its two sides may take. */
 export const PANEL_MIN = `${RATIO_MIN}%`
 
-/** The default windows: 中文 | English, side by side. */
+/** The default layout: a 中文 pane and an English pane, side by side. */
 export function defaultLayout(): LayoutNode {
   return {
     kind: 'split',

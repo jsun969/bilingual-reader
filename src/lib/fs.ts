@@ -10,7 +10,7 @@ import type { ChapterFiles, MarkdownSource, PdfSource } from '../types'
 /** Thrown when a folder has nothing this reader knows how to open. */
 export class ImportError extends Error {
   constructor() {
-    super('文件夹里没有可识别的文件')
+    super('这个文件夹里没有可识别的文件')
     this.name = 'ImportError'
   }
 }

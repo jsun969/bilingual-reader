@@ -1,6 +1,6 @@
-// Cloudflare Workers 部署配置：纯静态资源 Worker（没有 main，只有 assets）。
-// 之前仓库里没有这个文件，CI 里的 `wrangler deploy` 每次都跑一遍自动配置
-// （改 vite 配置、装 @cloudflare/vite-plugin、二次构建），这里把结果固定下来。
+// Cloudflare Workers 部署配置：只有静态资源的 Worker（没有 main，只有 assets）。
+// 之前仓库里没有这个文件，CI 里的 `wrangler deploy` 每次都要跑一遍自动配置
+// （改 vite 配置、装 @cloudflare/vite-plugin、再构建一次），这里把结果固定下来。
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bilingual-reader",

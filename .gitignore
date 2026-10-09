@@ -3,10 +3,10 @@ dist/
 .DS_Store
 *.log
 
-# wrangler 的本地状态（wrangler deploy / dev 生成）
+# wrangler 在本地留下的状态（wrangler deploy / dev 生成）
 .wrangler/
 
-# 本地阅读素材（各章 markdown / PDF / 配图）：现在由浏览器导入文件夹读取，
-# 但仍然不入库，放在本地即可
+# 本地阅读素材：各章的 markdown、PDF、配图。现在由浏览器导入文件夹读取，
+# 不再打包，但还是不入库，放在本地即可
 asset/
 assets/

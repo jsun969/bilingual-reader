@@ -38,8 +38,8 @@ export function App() {
   }, [restore])
 
   // Pressing anywhere but the shelf itself puts it away. The listener sits on the
-  // workspace, so the top bar's 目录 button — outside this element — keeps its own
-  // toggle, and the wheel over the text still scrolls the text.
+  // workspace, so the top bar's 目录 button, which is outside this element, keeps
+  // its own toggle, and the wheel over the text still scrolls the text.
   useEffect(() => {
     const workspace = workspaceRef.current
     if (!shelfOpen || !workspace) return

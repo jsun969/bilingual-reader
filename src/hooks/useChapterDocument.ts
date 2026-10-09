@@ -9,8 +9,8 @@ const MISSING: ChapterDoc = { status: 'missing', html: '', outline: [], detail: 
 
 /**
  * Loads and renders one markdown file out of the chapter's folder. Results are
- * cached under `cacheKey`, so flipping between 中文 and English — or reopening
- * the ADHD panel — never reads the file twice. `missing` tells the difference
+ * cached under `cacheKey`, so switching from 中文 to English, or reopening the
+ * ADHD panel, never reads the file twice. `missing` tells the difference
  * between "nothing is selected" (idle) and "this chapter has no such file"
  * (missing, which the pane explains).
  */

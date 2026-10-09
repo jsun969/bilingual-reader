@@ -7,7 +7,7 @@ export function PdfFrame({ path }: PdfFrameProps) {
   return (
     <iframe
       className="pdf-view"
-      title="章节原件 PDF"
+      title="本章的 PDF 原件"
       src={`${path}#view=FitH`}
       loading="lazy"
     />
