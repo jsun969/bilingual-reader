@@ -111,6 +111,8 @@ restore()
   `id` 加栏前缀（`p1-`）并重写 `a[href^="#"]`，所以多栏显示同一章时锚点 / 脚注 / `#fig-4-1` 引用互不串 →
   标题生成 outline（`h1`–`h4`）→ 图片交给 `resolveAsset` 回调 → 链接加 `target=_blank` →
   `pre > code` 交给 shiki（没标语言的代码块是书里的 ASCII 图，原样保留）。
+  `src/lib/highlighter.ts` 用 `createHighlighter({ themes: [INK_THEME], langs: [] })`，grammar 在第一次
+  遇到该语言时才 `loadLanguage()`——所以构建产物里每种语言 / 主题各是一个懒加载 chunk，首屏只拿用到的那几个。
 - `src/hooks/useChapterDocument.ts`：`useChapterDocument`（本栏语言）/ `useAdhdDocument`（按章）/
   `usePdfDocument`（**按章一次**把 PDF 变成 blob URL）。渲染结果按 `viewKey` 进 `docCache`，
   切语言 / 重开 ADHD 面板不重读文件；句柄或文件名变了会重新读。
@@ -139,7 +141,20 @@ restore()
   （导入 / 重命名 / 重新选择文件夹）；拖拽与「选择文件夹」共用 `acceptFolder()`，扫描失败就不改字段。
 - **图标**：一律 `react-icons/lu`，按钮共用 `.tool-btn`（26px 高）+ 纯图标 `.icon-btn`，尺寸在 CSS 里统一给。
 
-## 9. 约定
+## 9. 部署（Cloudflare Workers 静态资源）
+
+- 形态：**只有 `assets` 的 Worker**（没有 `main`、没有绑定），配置全在 `wrangler.jsonc`：
+  `name` / `assets.directory = ./dist` / `not_found_handling = single-page-application`
+  / `workers_dev` / `preview_urls`。仓库里没有这个文件时，CI 里的 `wrangler deploy` 会每次自己跑一遍
+  自动配置（改 `vite.config.ts`、临时装 `@cloudflare/vite-plugin`、二次构建），所以把它提交进来。
+- CI（Workers Builds）：构建命令 `pnpm run build`、部署命令 `npx wrangler deploy`；wrangler 固定在
+  devDependencies（`npx` 优先用仓库里这份），`pnpm install --frozen-lockfile` 走 `pnpm-lock.yaml`。
+- 手动部署：`pnpm build && pnpm exec wrangler deploy`（首次要 `wrangler login`）。
+  **不要**把它写成 `deploy` 脚本：`pnpm deploy` 是 pnpm 内置命令（workspace 部署），会撞名。
+- `dist/assets` 里 300 多个 js 是 shiki 按需的语言 / 主题 chunk（见 §7），不是打包事故：
+  Worker 单版本上限 2 万个文件 / 单文件 25 MiB，这点量级无压力。
+
+## 10. 约定
 
 - **目录结构 / 文件名是唯一事实来源**，代码里不写死任何章节名或素材名；素材目录 `asset/`、`assets/`
   不入库（见 `.gitignore`），现在只作为本地待导入的素材。

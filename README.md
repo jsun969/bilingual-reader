@@ -30,6 +30,9 @@ pnpm dev        # http://localhost:5273
 
 其他命令：`pnpm build`（类型检查 + 打包到 `dist/`）、`pnpm preview`（预览打包结果）。
 
+部署：`pnpm build && pnpm exec wrangler deploy` 推到 Cloudflare Workers，配置见 `wrangler.jsonc`；
+仓库连的 Workers Builds 跑的就是这两步（构建 `pnpm run build` + 部署 `npx wrangler deploy`）。
+
 ## 🌐 浏览器
 
 需要 **Chrome / Edge**：导入本地文件夹用的是 File System Access API，其它浏览器里那个按钮会禁用并说明原因。
