@@ -23,27 +23,21 @@ export interface SplitNode {
 
 export type LayoutNode = PaneLeaf | SplitNode
 
+/** One markdown file inside a chapter folder, named exactly as it sits on disk. */
 export interface MarkdownSource {
-  /** URL the browser fetches the raw markdown from, e.g. /asset/chapter04-Processes/zh.md */
-  path: string
+  /** File name inside the imported folder, e.g. `zh.md`. */
+  name: string
   /** Estimated reading time in minutes. */
   minutes: number
 }
 
 export interface PdfSource {
-  path: string
+  name: string
   bytes: number
 }
 
-export interface Chapter {
-  /** Directory name under the asset root, e.g. chapter04-Processes */
-  slug: string
-  /** Chapter number exactly as written in the directory name, e.g. "04". */
-  num: string
-  /** Numeric order used for sorting. */
-  order: number
-  /** Human title derived from the directory name, e.g. "Processes". */
-  title: string
+/** What one folder yielded: the sources the reader knows how to open. */
+export interface ChapterFiles {
   /**
    * Optional condensed rendition of the chapter, English, meant to be skimmed
    * in a panel of its own. Not a language: it sits beside `sources`, and a
@@ -57,10 +51,35 @@ export interface Chapter {
   }
 }
 
-export interface Catalog {
-  /** Name of the scanned asset directory, e.g. "asset". */
-  assetDir: string
-  chapters: Chapter[]
+/**
+ * A chapter as stored: the id it is known by, the number and title the reader
+ * typed when importing the folder, and what was found inside it.
+ */
+export interface ChapterMeta extends ChapterFiles {
+  /** Generated identity; also the key of the folder handle in IndexedDB. */
+  id: string
+  /** Chapter number as typed, e.g. "04". Empty when the reader left it blank. */
+  num: string
+  /** Chapter title as typed. */
+  title: string
+  /** Numeric order used for sorting; blank/unparsable numbers sort last. */
+  order: number
+}
+
+/**
+ * What the browser currently makes of a chapter's folder. `loading` is the
+ * moment between the metadata coming out of `localStorage` and the handle
+ * being checked; `needs-permission` waits for a click (Chromium only hands
+ * back read access on a user gesture); `missing` is a folder that was moved,
+ * deleted, or renamed away.
+ */
+export type ChapterStatus = 'loading' | 'ready' | 'needs-permission' | 'missing'
+
+/** A stored chapter, its live folder handle, and the state of that handle. */
+export interface Chapter extends ChapterMeta {
+  status: ChapterStatus
+  /** Undefined until the handle is recovered from IndexedDB or relinked. */
+  handle?: FileSystemDirectoryHandle
 }
 
 export interface OutlineItem {
